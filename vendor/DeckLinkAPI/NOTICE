@@ -1,0 +1,12 @@
+The files in this directory are excerpted from the Blackmagic DeckLink SDK 16.0
+and are redistributed here solely to allow building this project without
+downloading the full SDK separately.
+
+These files are copyright Blackmagic Design and are subject to the
+Blackmagic DeckLink SDK End User License Agreement. By using these files you
+agree to those terms. The full SDK, documentation, and EULA are available from:
+
+  https://www.blackmagicdesign.com/support
+
+Only the macOS API headers and DeckLinkAPIDispatch.cpp are included here.
+The SDK examples, documentation, and binaries are not included.

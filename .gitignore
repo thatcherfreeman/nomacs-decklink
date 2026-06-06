@@ -1,0 +1,5 @@
+build/
+CMakeUser.txt
+
+# Full Blackmagic SDK download (only vendor/DeckLinkAPI/ headers are committed)
+Blackmagic DeckLink SDK*/

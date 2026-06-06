@@ -130,8 +130,8 @@ set(NOMACS_INCLUDE_DIRECTORY
 # Path to the installed nomacs app bundle
 set(NOMACS_APP "/Applications/nomacs.app")
 
-# Path to the DeckLink SDK (default: Blackmagic DeckLink SDK 16.0/ in this repo)
-set(DECKLINK_SDK_DIR "/path/to/Blackmagic DeckLink SDK 16.0")
+# Path to the DeckLink API headers (default: vendor/DeckLinkAPI/ in this repo)
+set(DECKLINK_INCLUDE_DIR "/path/to/DeckLink SDK/Mac/include")
 ```
 
 ---

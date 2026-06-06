@@ -25,11 +25,10 @@ set(NOMACS_FRAMEWORKS_DIR "${NOMACS_APP}/Contents/Frameworks")
 set(NOMACS_PLUGINS_DIR    "${NOMACS_APP}/Contents/PlugIns/nomacs")
 set(NOMACS_CORE_LIB       "${NOMACS_FRAMEWORKS_DIR}/libnomacsCore-3.22.1.dylib")
 
-# DeckLink SDK root – default: sibling directory in this repo
-if(NOT DEFINED DECKLINK_SDK_DIR)
-    set(DECKLINK_SDK_DIR "${CMAKE_SOURCE_DIR}/Blackmagic DeckLink SDK 16.0")
+# DeckLink SDK headers – default: vendor/DeckLinkAPI in this repo
+if(NOT DEFINED DECKLINK_INCLUDE_DIR)
+    set(DECKLINK_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/vendor/DeckLinkAPI")
 endif()
-set(DECKLINK_INCLUDE_DIR "${DECKLINK_SDK_DIR}/Mac/include")
 
 # -----------------------------------------------------------------------
 # Qt  (pick up the Homebrew Qt6 that nomacs was built against)

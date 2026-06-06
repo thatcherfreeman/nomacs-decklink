@@ -1,0 +1,74 @@
+name: Release
+
+# Triggers when you push a version tag, e.g.:  git tag v1.0.0 && git push --tags
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: macos-14   # Apple Silicon M1 — required; Intel Macs cannot produce arm64 plugins
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # -----------------------------------------------------------------------
+      # Dependencies
+      # -----------------------------------------------------------------------
+      - name: Install build tools
+        run: brew install cmake qt
+
+      # -----------------------------------------------------------------------
+      # nomacs app bundle — needed for libnomacsCore and Qt frameworks to link
+      # against at build time.  The zip contains nomacs.app at its root.
+      # -----------------------------------------------------------------------
+      - name: Download nomacs 3.22.1 app bundle (arm64)
+        run: |
+          curl -fsSL \
+            "https://github.com/nomacs/nomacs/releases/download/3.22.1/nomacs-3.22.1-8f3dff6f-macOS-15.7.4-arm64-quazip-qt6.zip" \
+            -o /tmp/nomacs.zip
+          unzip -q /tmp/nomacs.zip -d /tmp/nomacs-app
+
+      - name: Locate nomacs.app inside zip
+        run: |
+          NOMACS_APP=$(find /tmp/nomacs-app -name "nomacs.app" -maxdepth 3 | head -1)
+          if [[ -z "$NOMACS_APP" ]]; then
+            echo "nomacs.app not found in zip"
+            ls -R /tmp/nomacs-app
+            exit 1
+          fi
+          echo "NOMACS_APP=$NOMACS_APP" >> "$GITHUB_ENV"
+
+      # -----------------------------------------------------------------------
+      # nomacs source — headers only; checkout the exact commit shipped in 3.22.1
+      # -----------------------------------------------------------------------
+      - name: Clone nomacs source at 3.22.1
+        run: |
+          git clone --depth=1 --branch 3.22.1 \
+            https://github.com/nomacs/nomacs.git /tmp/nomacs-src
+
+      # -----------------------------------------------------------------------
+      # Build
+      # -----------------------------------------------------------------------
+      - name: Configure CMake
+        run: |
+          cmake -S . -B build -G "Unix Makefiles" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_SYSROOT="$(xcrun --sdk macosx --show-sdk-path)" \
+            -DNOMACS_APP="${NOMACS_APP}" \
+            -DNOMACS_INCLUDE_DIRECTORY="${NOMACS_SRC}/ImageLounge/src/DkCore;${NOMACS_SRC}/ImageLounge/src/DkGui;${NOMACS_SRC}/ImageLounge/src"
+        env:
+          NOMACS_SRC: /tmp/nomacs-src
+
+      - name: Build
+        run: cmake --build build -j4
+
+      # -----------------------------------------------------------------------
+      # Release — attach the dylib to the GitHub Release created by the tag push
+      # -----------------------------------------------------------------------
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/libnomacs-decklink.dylib
+          fail_on_unmatched_files: true

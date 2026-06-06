@@ -22,7 +22,7 @@ The easiest way to install — no compiler required.
 curl -fsSL https://raw.githubusercontent.com/thatcherfreeman/nomacs-decklink/main/scripts/install.sh | bash
 ```
 
-Or download `libnomacs-decklink.dylib` from the [Releases page](https://github.com/OWNER/nomacs-decklink/releases/latest) and drop it into `/Applications/nomacs.app/Contents/PlugIns/nomacs/` yourself.
+Or download `libnomacs-decklink.dylib` from the [Releases page](https://github.com/thatcherfreeman/nomacs-decklink/releases/latest) and drop it into `/Applications/nomacs.app/Contents/PlugIns/nomacs/` yourself.
 
 Restart nomacs after installing — the plugin appears under **Plugins → DeckLink Output**.
 

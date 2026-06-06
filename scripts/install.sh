@@ -2,14 +2,14 @@
 # install.sh — download and install the latest nomacs-decklink plugin
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/OWNER/nomacs-decklink/main/scripts/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/thatcherfreeman/nomacs-decklink/main/scripts/install.sh | bash
 #
 # Or after cloning:
 #   bash scripts/install.sh
 
 set -euo pipefail
 
-REPO="OWNER/nomacs-decklink"          # ← replace with your GitHub user/repo
+REPO="thatcherfreeman/nomacs-decklink"
 PLUGIN_NAME="libnomacs-decklink.dylib"
 PLUGIN_DIR="/Applications/nomacs.app/Contents/PlugIns/nomacs"
 

@@ -1,9 +1,0 @@
-/Users/thatcher/coding/nomacs-decklink/build/CMakeFiles/nomacs-decklink.dir
-/Users/thatcher/coding/nomacs-decklink/build/CMakeFiles/edit_cache.dir
-/Users/thatcher/coding/nomacs-decklink/build/CMakeFiles/rebuild_cache.dir
-/Users/thatcher/coding/nomacs-decklink/build/CMakeFiles/list_install_components.dir
-/Users/thatcher/coding/nomacs-decklink/build/CMakeFiles/install.dir
-/Users/thatcher/coding/nomacs-decklink/build/CMakeFiles/install/local.dir
-/Users/thatcher/coding/nomacs-decklink/build/CMakeFiles/install/strip.dir
-/Users/thatcher/coding/nomacs-decklink/build/CMakeFiles/nomacs-decklink_autogen_timestamp_deps.dir
-/Users/thatcher/coding/nomacs-decklink/build/CMakeFiles/nomacs-decklink_autogen.dir

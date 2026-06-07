@@ -1,4 +1,0 @@
-# Hashes of file build rules.
-c0e143b93129aa0ca71e0530b02b52ea CMakeFiles/nomacs-decklink_autogen
-f8cbfcef269257fb322016c4bfb44741 nomacs-decklink_autogen/timestamp
-828a03bb12f76206e435488c7cc0dda7 qrc_nomacsPlugin.cpp

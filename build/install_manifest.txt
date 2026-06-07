@@ -1,1 +1,0 @@
-/Applications/nomacs.app/Contents/PlugIns/nomacs/libnomacs-decklink.dylib

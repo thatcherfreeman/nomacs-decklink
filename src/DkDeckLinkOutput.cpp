@@ -234,12 +234,15 @@ bool DkDeckLinkOutput::startOutput(const DkOutputConfig &cfg)
         return false;
     }
 
-    // Configure SDI link mode
+    // Apply output configuration flags
     IDeckLinkConfiguration *dlCfg = nullptr;
     if (mDeckLink->QueryInterface(IID_IDeckLinkConfiguration,
                                    reinterpret_cast<void **>(&dlCfg)) == S_OK) {
         dlCfg->SetInt(bmdDeckLinkConfigSDIOutputLinkConfiguration,
                       static_cast<int64_t>(cfg.linkConfig));
+        dlCfg->SetFlag(bmdDeckLinkConfigRec2020Output,      cfg.rec2020);
+        dlCfg->SetFlag(bmdDeckLinkConfigSMPTELevelAOutput,  cfg.smpteLevelA);
+        dlCfg->SetFlag(bmdDeckLinkConfigOutput1080pAsPsF,   cfg.outputAsPsF);
         dlCfg->Release();
     }
 

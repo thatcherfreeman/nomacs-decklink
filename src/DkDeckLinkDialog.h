@@ -41,6 +41,9 @@ private:
     QComboBox *mLinkCombo        = nullptr;
     QCheckBox *mLegalCheck       = nullptr;
     QCheckBox *mReleaseCheck     = nullptr;
+    QCheckBox *mRec2020Check     = nullptr;
+    QCheckBox *mSmpteLevelACheck = nullptr;
+    QCheckBox *mPsFCheck         = nullptr;
     QLabel    *mStatusLabel      = nullptr;
     QLabel    *mLinkLabel        = nullptr;
 

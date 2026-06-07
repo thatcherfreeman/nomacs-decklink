@@ -37,6 +37,9 @@ struct DkOutputConfig {
     bool legalRange = true;
     BMDLinkConfiguration linkConfig = bmdLinkConfigurationSingleLink;
     bool releaseOnFocusLoss = false;
+    bool rec2020 = false;
+    bool smpteLevelA = false;
+    bool outputAsPsF = false;
 };
 
 // -----------------------------------------------------------------------

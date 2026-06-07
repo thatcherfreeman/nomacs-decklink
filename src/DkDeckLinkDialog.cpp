@@ -35,6 +35,9 @@ DkDeckLinkDialog::DkDeckLinkDialog(DkDeckLinkOutput *output, QWidget *parent)
                                                     s.value(QStringLiteral("linkConfig"),
                                                             static_cast<int>(bmdLinkConfigurationSingleLink)).toInt());
             mOriginalConfig.releaseOnFocusLoss = s.value(QStringLiteral("releaseOnFocusLoss"), false).toBool();
+            mOriginalConfig.rec2020            = s.value(QStringLiteral("rec2020"), false).toBool();
+            mOriginalConfig.smpteLevelA        = s.value(QStringLiteral("smpteLevelA"), false).toBool();
+            mOriginalConfig.outputAsPsF        = s.value(QStringLiteral("outputAsPsF"), false).toBool();
             mHasOriginal = true; // enables pre-population; configChanged() is irrelevant when not running
         }
         s.endGroup();
@@ -44,15 +47,19 @@ DkDeckLinkDialog::DkDeckLinkDialog(DkDeckLinkOutput *output, QWidget *parent)
     mModeCombo   = new QComboBox(this);
     mFormatCombo = new QComboBox(this);
     mLinkCombo   = new QComboBox(this);
-    mLegalCheck  = new QCheckBox(tr("Legal range (SMPTE 64–940 / 64–960)"), this);
-    mLinkLabel   = new QLabel(tr("SDI link:"), this);
-    mStatusLabel = new QLabel(this);
+    mLegalCheck       = new QCheckBox(tr("Legal range (SMPTE 64–940 / 64–960)"), this);
+    mLinkLabel        = new QLabel(tr("SDI link:"), this);
+    mStatusLabel      = new QLabel(this);
     mStatusLabel->setWordWrap(true);
 
-    mReleaseCheck = new QCheckBox(tr("Release device when nomacs loses focus"), this);
+    mReleaseCheck     = new QCheckBox(tr("Release device when nomacs loses focus"), this);
+    mRec2020Check     = new QCheckBox(tr("Rec. 2020 output"), this);
+    mSmpteLevelACheck = new QCheckBox(tr("SMPTE Level A output"), this);
+    mPsFCheck         = new QCheckBox(tr("Output 1080p as PsF"), this);
 
     mLinkCombo->addItem(tr("Single link"), static_cast<int>(bmdLinkConfigurationSingleLink));
     mLinkCombo->addItem(tr("Dual link"),   static_cast<int>(bmdLinkConfigurationDualLink));
+    mLinkCombo->addItem(tr("Quad link"),   static_cast<int>(bmdLinkConfigurationQuadLink));
     mLinkCombo->setMinimumContentsLength(28);
     mLinkCombo->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
     mFormatCombo->setMinimumContentsLength(28);
@@ -64,6 +71,9 @@ DkDeckLinkDialog::DkDeckLinkDialog(DkDeckLinkOutput *output, QWidget *parent)
     form->addRow(tr("Pixel format:"),mFormatCombo);
     form->addRow(mLinkLabel,         mLinkCombo);
     form->addRow(QString(),          mLegalCheck);
+    form->addRow(QString(),          mRec2020Check);
+    form->addRow(QString(),          mSmpteLevelACheck);
+    form->addRow(QString(),          mPsFCheck);
     form->addRow(QString(),          mReleaseCheck);
     form->addRow(mStatusLabel);
 
@@ -81,6 +91,9 @@ DkDeckLinkDialog::DkDeckLinkDialog(DkDeckLinkOutput *output, QWidget *parent)
         s.setValue(QStringLiteral("legalRange"),        c.legalRange);
         s.setValue(QStringLiteral("linkConfig"),        static_cast<int>(c.linkConfig));
         s.setValue(QStringLiteral("releaseOnFocusLoss"), c.releaseOnFocusLoss);
+        s.setValue(QStringLiteral("rec2020"),           c.rec2020);
+        s.setValue(QStringLiteral("smpteLevelA"),       c.smpteLevelA);
+        s.setValue(QStringLiteral("outputAsPsF"),       c.outputAsPsF);
         s.endGroup();
 
         // configChanged() is only meaningful when the output was running when
@@ -91,7 +104,10 @@ DkDeckLinkDialog::DkDeckLinkDialog(DkDeckLinkOutput *output, QWidget *parent)
                           || c.pixelFormat         != mOriginalConfig.pixelFormat
                           || c.legalRange          != mOriginalConfig.legalRange
                           || c.linkConfig          != mOriginalConfig.linkConfig
-                          || c.releaseOnFocusLoss  != mOriginalConfig.releaseOnFocusLoss;
+                          || c.releaseOnFocusLoss  != mOriginalConfig.releaseOnFocusLoss
+                          || c.rec2020             != mOriginalConfig.rec2020
+                          || c.smpteLevelA         != mOriginalConfig.smpteLevelA
+                          || c.outputAsPsF         != mOriginalConfig.outputAsPsF;
         } else {
             mConfigChanged = true;
         }
@@ -116,12 +132,18 @@ DkDeckLinkDialog::DkDeckLinkDialog(DkDeckLinkOutput *output, QWidget *parent)
     if (mHasOriginal) {
         mLegalCheck->setChecked(mOriginalConfig.legalRange);
         mReleaseCheck->setChecked(mOriginalConfig.releaseOnFocusLoss);
+        mRec2020Check->setChecked(mOriginalConfig.rec2020);
+        mSmpteLevelACheck->setChecked(mOriginalConfig.smpteLevelA);
+        mPsFCheck->setChecked(mOriginalConfig.outputAsPsF);
         const int li = mLinkCombo->findData(static_cast<int>(mOriginalConfig.linkConfig));
         if (li >= 0)
             mLinkCombo->setCurrentIndex(li);
     } else {
         mLegalCheck->setChecked(true);
         mReleaseCheck->setChecked(false);
+        mRec2020Check->setChecked(false);
+        mSmpteLevelACheck->setChecked(false);
+        mPsFCheck->setChecked(false);
     }
 }
 
@@ -295,6 +317,9 @@ DkOutputConfig DkDeckLinkDialog::config() const
 
     cfg.legalRange          = mLegalCheck->isChecked();
     cfg.releaseOnFocusLoss  = mReleaseCheck->isChecked();
+    cfg.rec2020             = mRec2020Check->isChecked();
+    cfg.smpteLevelA         = mSmpteLevelACheck->isChecked();
+    cfg.outputAsPsF         = mPsFCheck->isChecked();
 
     const int li = mLinkCombo->currentIndex();
     cfg.linkConfig = (li >= 0)

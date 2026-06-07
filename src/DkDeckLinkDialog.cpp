@@ -30,10 +30,11 @@ DkDeckLinkDialog::DkDeckLinkDialog(DkDeckLinkOutput *output, QWidget *parent)
             mOriginalConfig.pixelFormat = static_cast<BMDPixelFormat>(
                                             s.value(QStringLiteral("pixelFormat"),
                                                     static_cast<int>(bmdFormat8BitBGRA)).toInt());
-            mOriginalConfig.legalRange  = s.value(QStringLiteral("legalRange"), true).toBool();
-            mOriginalConfig.linkConfig  = static_cast<BMDLinkConfiguration>(
-                                            s.value(QStringLiteral("linkConfig"),
-                                                    static_cast<int>(bmdLinkConfigurationSingleLink)).toInt());
+            mOriginalConfig.legalRange        = s.value(QStringLiteral("legalRange"), true).toBool();
+            mOriginalConfig.linkConfig        = static_cast<BMDLinkConfiguration>(
+                                                    s.value(QStringLiteral("linkConfig"),
+                                                            static_cast<int>(bmdLinkConfigurationSingleLink)).toInt());
+            mOriginalConfig.releaseOnFocusLoss = s.value(QStringLiteral("releaseOnFocusLoss"), false).toBool();
             mHasOriginal = true; // enables pre-population; configChanged() is irrelevant when not running
         }
         s.endGroup();
@@ -48,6 +49,8 @@ DkDeckLinkDialog::DkDeckLinkDialog(DkDeckLinkOutput *output, QWidget *parent)
     mStatusLabel = new QLabel(this);
     mStatusLabel->setWordWrap(true);
 
+    mReleaseCheck = new QCheckBox(tr("Release device when nomacs loses focus"), this);
+
     mLinkCombo->addItem(tr("Single link"), static_cast<int>(bmdLinkConfigurationSingleLink));
     mLinkCombo->addItem(tr("Dual link"),   static_cast<int>(bmdLinkConfigurationDualLink));
     mLinkCombo->setMinimumContentsLength(28);
@@ -61,6 +64,7 @@ DkDeckLinkDialog::DkDeckLinkDialog(DkDeckLinkOutput *output, QWidget *parent)
     form->addRow(tr("Pixel format:"),mFormatCombo);
     form->addRow(mLinkLabel,         mLinkCombo);
     form->addRow(QString(),          mLegalCheck);
+    form->addRow(QString(),          mReleaseCheck);
     form->addRow(mStatusLabel);
 
     auto *buttons = new QDialogButtonBox(
@@ -71,21 +75,23 @@ DkDeckLinkDialog::DkDeckLinkDialog(DkDeckLinkOutput *output, QWidget *parent)
         // Persist for future sessions
         QSettings s;
         s.beginGroup(QStringLiteral("DeckLinkOutput"));
-        s.setValue(QStringLiteral("deviceName"),   mDeviceCombo->currentText());
-        s.setValue(QStringLiteral("displayMode"),  static_cast<quint32>(c.mode.mode));
-        s.setValue(QStringLiteral("pixelFormat"),  static_cast<int>(c.pixelFormat));
-        s.setValue(QStringLiteral("legalRange"),   c.legalRange);
-        s.setValue(QStringLiteral("linkConfig"),   static_cast<int>(c.linkConfig));
+        s.setValue(QStringLiteral("deviceName"),        mDeviceCombo->currentText());
+        s.setValue(QStringLiteral("displayMode"),       static_cast<quint32>(c.mode.mode));
+        s.setValue(QStringLiteral("pixelFormat"),       static_cast<int>(c.pixelFormat));
+        s.setValue(QStringLiteral("legalRange"),        c.legalRange);
+        s.setValue(QStringLiteral("linkConfig"),        static_cast<int>(c.linkConfig));
+        s.setValue(QStringLiteral("releaseOnFocusLoss"), c.releaseOnFocusLoss);
         s.endGroup();
 
         // configChanged() is only meaningful when the output was running when
         // the dialog opened (mHasOriginal from running state, not from QSettings).
         if (mHasOriginal && mOutput && mOutput->isRunning()) {
-            mConfigChanged = c.deviceIndex != mOriginalConfig.deviceIndex
-                          || c.mode.mode   != mOriginalConfig.mode.mode
-                          || c.pixelFormat != mOriginalConfig.pixelFormat
-                          || c.legalRange  != mOriginalConfig.legalRange
-                          || c.linkConfig  != mOriginalConfig.linkConfig;
+            mConfigChanged = c.deviceIndex        != mOriginalConfig.deviceIndex
+                          || c.mode.mode           != mOriginalConfig.mode.mode
+                          || c.pixelFormat         != mOriginalConfig.pixelFormat
+                          || c.legalRange          != mOriginalConfig.legalRange
+                          || c.linkConfig          != mOriginalConfig.linkConfig
+                          || c.releaseOnFocusLoss  != mOriginalConfig.releaseOnFocusLoss;
         } else {
             mConfigChanged = true;
         }
@@ -109,11 +115,13 @@ DkDeckLinkDialog::DkDeckLinkDialog(DkDeckLinkOutput *output, QWidget *parent)
 
     if (mHasOriginal) {
         mLegalCheck->setChecked(mOriginalConfig.legalRange);
+        mReleaseCheck->setChecked(mOriginalConfig.releaseOnFocusLoss);
         const int li = mLinkCombo->findData(static_cast<int>(mOriginalConfig.linkConfig));
         if (li >= 0)
             mLinkCombo->setCurrentIndex(li);
     } else {
         mLegalCheck->setChecked(true);
+        mReleaseCheck->setChecked(false);
     }
 }
 
@@ -285,7 +293,8 @@ DkOutputConfig DkDeckLinkDialog::config() const
     else
         cfg.pixelFormat = bmdFormat8BitBGRA;
 
-    cfg.legalRange = mLegalCheck->isChecked();
+    cfg.legalRange          = mLegalCheck->isChecked();
+    cfg.releaseOnFocusLoss  = mReleaseCheck->isChecked();
 
     const int li = mLinkCombo->currentIndex();
     cfg.linkConfig = (li >= 0)

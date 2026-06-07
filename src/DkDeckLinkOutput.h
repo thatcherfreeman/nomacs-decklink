@@ -34,8 +34,9 @@ struct DkOutputConfig {
     int deviceIndex = -1;
     DkDisplayModeInfo mode;
     BMDPixelFormat pixelFormat = bmdFormat8BitBGRA;
-    bool legalRange = true;                                    // YUV only: legal (SMPTE) vs full
+    bool legalRange = true;
     BMDLinkConfiguration linkConfig = bmdLinkConfigurationSingleLink;
+    bool releaseOnFocusLoss = false;
 };
 
 // -----------------------------------------------------------------------

@@ -35,13 +35,14 @@ private:
     void updateLinkVisibility(int deviceIndex);
     void updateLevelsVisibility();
 
-    QComboBox *mDeviceCombo  = nullptr;
-    QComboBox *mModeCombo    = nullptr;
-    QComboBox *mFormatCombo  = nullptr;
-    QComboBox *mLinkCombo    = nullptr;
-    QCheckBox *mLegalCheck   = nullptr;
-    QLabel    *mStatusLabel  = nullptr;
-    QLabel    *mLinkLabel    = nullptr;
+    QComboBox *mDeviceCombo      = nullptr;
+    QComboBox *mModeCombo        = nullptr;
+    QComboBox *mFormatCombo      = nullptr;
+    QComboBox *mLinkCombo        = nullptr;
+    QCheckBox *mLegalCheck       = nullptr;
+    QCheckBox *mReleaseCheck     = nullptr;
+    QLabel    *mStatusLabel      = nullptr;
+    QLabel    *mLinkLabel        = nullptr;
 
     QVector<DkDisplayModeInfo> mModes;
     QVector<DkPixelFormatInfo> mFormats;

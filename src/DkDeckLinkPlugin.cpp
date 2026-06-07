@@ -2,6 +2,7 @@
 #include "DkDeckLinkViewPort.h"
 #include "DkDeckLinkDialog.h"
 
+#include <QGuiApplication>
 #include <QLabel>
 #include <QMainWindow>
 #include <QMessageBox>
@@ -53,6 +54,7 @@ void DkDeckLinkPlugin::setVisible(bool visible)
         const DkOutputConfig cfg = dlg.config();
 
         if (!mOutput->isRunning() || dlg.configChanged()) {
+            disconnect(mStateConn);
             mOutput->stopOutput();
             if (!mOutput->startOutput(cfg)) {
                 QMessageBox::critical(getMainWindow(),
@@ -63,6 +65,12 @@ void DkDeckLinkPlugin::setVisible(bool visible)
             }
         }
 
+        mLastConfig = cfg;
+        if (cfg.releaseOnFocusLoss) {
+            mStateConn = connect(qApp, &QGuiApplication::applicationStateChanged,
+                                 this, &DkDeckLinkPlugin::onApplicationStateChanged);
+        }
+
         // Immediately send whatever image is currently displayed so the output
         // shows something before the next image-change event fires.
         if (mViewPort->lastContainer())
@@ -70,6 +78,7 @@ void DkDeckLinkPlugin::setVisible(bool visible)
 
         showStopToolBar();
     } else {
+        disconnect(mStateConn);
         if (mOutput)
             mOutput->stopOutput();
         hideStopToolBar();
@@ -120,6 +129,21 @@ void DkDeckLinkPlugin::hideStopToolBar()
 
     delete mStopBar;
     mStopBar = nullptr;
+}
+
+void DkDeckLinkPlugin::onApplicationStateChanged(Qt::ApplicationState state)
+{
+    if (!mOutput)
+        return;
+
+    if (state == Qt::ApplicationInactive) {
+        mOutput->stopOutput();
+    } else if (state == Qt::ApplicationActive && !mOutput->isRunning()) {
+        if (mOutput->startOutput(mLastConfig)) {
+            if (mViewPort && mViewPort->lastContainer())
+                mOutput->sendImage(mViewPort->lastContainer()->image());
+        }
+    }
 }
 
 } // namespace nmc

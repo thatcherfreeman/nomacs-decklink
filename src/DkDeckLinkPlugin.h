@@ -3,6 +3,7 @@
 #include "DkPluginInterface.h"
 #include "DkDeckLinkOutput.h"
 
+#include <QMetaObject>
 #include <QToolBar>
 
 namespace nmc
@@ -37,13 +38,18 @@ public:
     DkPluginViewPort *getViewPort() override;
     void setVisible(bool visible) override;
 
+private slots:
+    void onApplicationStateChanged(Qt::ApplicationState state);
+
 private:
     void showStopToolBar();
     void hideStopToolBar();
 
-    DkDeckLinkViewPort *mViewPort  = nullptr;
-    DkDeckLinkOutput   *mOutput    = nullptr;
-    QToolBar           *mStopBar   = nullptr;
+    DkDeckLinkViewPort     *mViewPort  = nullptr;
+    DkDeckLinkOutput       *mOutput    = nullptr;
+    QToolBar               *mStopBar   = nullptr;
+    DkOutputConfig          mLastConfig;
+    QMetaObject::Connection mStateConn;
 };
 
 } // namespace nmc

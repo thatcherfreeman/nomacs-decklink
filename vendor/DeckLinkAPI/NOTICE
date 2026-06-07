@@ -8,5 +8,5 @@ agree to those terms. The full SDK, documentation, and EULA are available from:
 
   https://www.blackmagicdesign.com/support
 
-Only the macOS API headers and DeckLinkAPIDispatch.cpp are included here.
+Only the macOS and Windows API headers and DeckLinkAPIDispatch.cpp are included here.
 The SDK examples, documentation, and binaries are not included.

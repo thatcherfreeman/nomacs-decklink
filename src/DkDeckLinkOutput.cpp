@@ -1,6 +1,6 @@
 #include "DkDeckLinkOutput.h"
+#include "DkDeckLinkPlatform.h"
 
-#include <CoreFoundation/CoreFoundation.h>
 #include <QDebug>
 #include <algorithm>
 #include <cstring>
@@ -17,16 +17,6 @@ namespace nmc
 // -----------------------------------------------------------------------
 // Internal helpers
 // -----------------------------------------------------------------------
-
-static QString cfStringToQString(CFStringRef s)
-{
-    if (!s)
-        return {};
-    CFIndex len = CFStringGetMaximumSizeForEncoding(CFStringGetLength(s), kCFStringEncodingUTF8) + 1;
-    QByteArray buf(static_cast<int>(len), '\0');
-    CFStringGetCString(s, buf.data(), len, kCFStringEncodingUTF8);
-    return QString::fromUtf8(buf.constData()); // constData() → null-terminated, avoids trailing-null garbage
-}
 
 static long computeRowBytes(long width, BMDPixelFormat fmt)
 {
@@ -80,10 +70,10 @@ QStringList DkDeckLinkOutput::enumerateDevices()
     QStringList names;
     IDeckLink *device = nullptr;
     while (it->Next(&device) == S_OK) {
-        CFStringRef name = nullptr;
+        BMDString name = nullptr;
         if (device->GetDisplayName(&name) == S_OK && name) {
-            names << cfStringToQString(name);
-            CFRelease(name);
+            names << bmdStringToQString(name);
+            bmdStringFree(name);
         } else {
             names << QStringLiteral("Unknown device");
         }
@@ -134,10 +124,10 @@ QVector<DkDisplayModeInfo> DkDeckLinkOutput::enumerateModes(int deviceIndex)
                 info.width = modeObj->GetWidth();
                 info.height = modeObj->GetHeight();
                 modeObj->GetFrameRate(&info.frameDuration, &info.timeScale);
-                CFStringRef mname = nullptr;
+                BMDString mname = nullptr;
                 if (modeObj->GetName(&mname) == S_OK && mname) {
-                    info.name = cfStringToQString(mname);
-                    CFRelease(mname);
+                    info.name = bmdStringToQString(mname);
+                    bmdStringFree(mname);
                 }
                 modes << info;
             }
@@ -207,11 +197,13 @@ bool DkDeckLinkOutput::supportsDualLink(int deviceIndex)
 DkDeckLinkOutput::DkDeckLinkOutput(QObject *parent)
     : QObject(parent)
 {
+    bmdPlatformInit();
 }
 
 DkDeckLinkOutput::~DkDeckLinkOutput()
 {
     stopOutput();
+    bmdPlatformUninit();
 }
 
 // -----------------------------------------------------------------------

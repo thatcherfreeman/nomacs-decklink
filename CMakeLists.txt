@@ -2,11 +2,15 @@ cmake_minimum_required(VERSION 3.16)
 project(nomacs-decklink)
 
 # -----------------------------------------------------------------------
-# Paths – override any of these in CMakeUser.txt if needed
+# User overrides  (create CMakeUser.txt in the repo root to set these)
 # -----------------------------------------------------------------------
 if(EXISTS "${CMAKE_SOURCE_DIR}/CMakeUser.txt")
     include("${CMAKE_SOURCE_DIR}/CMakeUser.txt")
 endif()
+
+# -----------------------------------------------------------------------
+# nomacs paths
+# -----------------------------------------------------------------------
 
 # nomacs source headers (DkCore + DkGui + src root all needed transitively)
 if(NOT DEFINED NOMACS_INCLUDE_DIRECTORY)
@@ -16,25 +20,56 @@ if(NOT DEFINED NOMACS_INCLUDE_DIRECTORY)
         "${CMAKE_SOURCE_DIR}/../nomacs/ImageLounge/src")
 endif()
 
-# nomacs installed app bundle (we link against the core lib inside it)
-if(NOT DEFINED NOMACS_APP)
-    set(NOMACS_APP "/Applications/nomacs.app")
-endif()
+if(APPLE)
+    # nomacs installed as an app bundle
+    if(NOT DEFINED NOMACS_APP)
+        set(NOMACS_APP "/Applications/nomacs.app")
+    endif()
+    set(NOMACS_FRAMEWORKS_DIR "${NOMACS_APP}/Contents/Frameworks")
+    set(NOMACS_PLUGINS_DIR    "${NOMACS_APP}/Contents/PlugIns/nomacs")
+    set(NOMACS_CORE_LIB       "${NOMACS_FRAMEWORKS_DIR}/libnomacsCore-3.22.1.dylib")
 
-set(NOMACS_FRAMEWORKS_DIR "${NOMACS_APP}/Contents/Frameworks")
-set(NOMACS_PLUGINS_DIR    "${NOMACS_APP}/Contents/PlugIns/nomacs")
-set(NOMACS_CORE_LIB       "${NOMACS_FRAMEWORKS_DIR}/libnomacsCore-3.22.1.dylib")
-
-# DeckLink SDK headers – default: vendor/DeckLinkAPI in this repo
-if(NOT DEFINED DECKLINK_INCLUDE_DIR)
-    set(DECKLINK_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/vendor/DeckLinkAPI")
+elseif(WIN32)
+    # nomacs installed as a flat directory on Windows
+    if(NOT DEFINED NOMACS_DIR)
+        set(NOMACS_DIR "C:/Program Files/nomacs")
+    endif()
+    set(NOMACS_PLUGINS_DIR "${NOMACS_DIR}/plugins/nomacs")
+    # nomacs may ship a .lib import library, or we generate one from the .dll
+    if(EXISTS "${NOMACS_DIR}/lib/nomacsCore.lib")
+        set(NOMACS_CORE_LIB "${NOMACS_DIR}/lib/nomacsCore.lib")
+    elseif(EXISTS "${NOMACS_DIR}/nomacsCore.lib")
+        set(NOMACS_CORE_LIB "${NOMACS_DIR}/nomacsCore.lib")
+    else()
+        message(WARNING
+            "nomacsCore.lib not found — plugin may fail to link.\n"
+            "Set NOMACS_DIR to the nomacs installation directory and ensure\n"
+            "nomacsCore.lib is present (see README for how to generate it).")
+        set(NOMACS_CORE_LIB "")
+    endif()
 endif()
 
 # -----------------------------------------------------------------------
-# Qt  (pick up the Homebrew Qt6 that nomacs was built against)
+# DeckLink SDK — platform-specific include directory and dispatch file
+# -----------------------------------------------------------------------
+if(APPLE)
+    if(NOT DEFINED DECKLINK_INCLUDE_DIR)
+        set(DECKLINK_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/vendor/DeckLinkAPI/Mac/include")
+    endif()
+elseif(WIN32)
+    if(NOT DEFINED DECKLINK_INCLUDE_DIR)
+        set(DECKLINK_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/vendor/DeckLinkAPI/Win/include")
+    endif()
+endif()
+
+# -----------------------------------------------------------------------
+# Qt  (pick up the Qt6 that nomacs was built against)
 # -----------------------------------------------------------------------
 if(NOT DEFINED CMAKE_PREFIX_PATH)
-    list(APPEND CMAKE_PREFIX_PATH /opt/homebrew)
+    if(APPLE)
+        list(APPEND CMAKE_PREFIX_PATH /opt/homebrew)
+    endif()
+    # On Windows, set Qt6_DIR in CMakeUser.txt or pass -DCMAKE_PREFIX_PATH=...
 endif()
 
 find_package(Qt6 6.0 REQUIRED COMPONENTS Core Gui Widgets)
@@ -53,15 +88,21 @@ set(SOURCES
     src/DkDeckLinkViewPort.cpp
     src/DkDeckLinkOutput.cpp
     src/DkDeckLinkDialog.cpp
-    # DeckLink SDK dispatch (loads the framework bundle at runtime)
+    # DeckLink SDK dispatch (loads the driver at runtime)
     "${DECKLINK_INCLUDE_DIR}/DeckLinkAPIDispatch.cpp"
 )
+
+# On Windows the dispatch includes DeckLinkAPI_i.c for COM GUIDs
+if(WIN32 AND EXISTS "${DECKLINK_INCLUDE_DIR}/DeckLinkAPI_i.c")
+    list(APPEND SOURCES "${DECKLINK_INCLUDE_DIR}/DeckLinkAPI_i.c")
+endif()
 
 set(HEADERS
     src/DkDeckLinkPlugin.h
     src/DkDeckLinkViewPort.h
     src/DkDeckLinkOutput.h
     src/DkDeckLinkDialog.h
+    src/DkDeckLinkPlatform.h
 )
 
 qt_add_resources(PLUGIN_RCC src/nomacsPlugin.qrc)
@@ -83,41 +124,58 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     QT_DLL
 )
 
-# Link Qt + CoreFoundation (for DeckLink API dispatch)
-target_link_libraries(${PROJECT_NAME}
-    ${QT_LIBS}
-    "-framework CoreFoundation"
-    # Link nomacs core so DkImageContainer, DkPluginInterface etc. resolve
-    "${NOMACS_CORE_LIB}"
-)
-
-# At runtime the plugin is loaded from inside the app bundle, where @rpath
-# resolves to the bundle's Frameworks directory.
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    INSTALL_RPATH "@loader_path/../../Frameworks"
-    BUILD_WITH_INSTALL_RPATH TRUE
-    MACOSX_RPATH TRUE
-)
-
 # -----------------------------------------------------------------------
-# Fix Qt references: Homebrew links with absolute paths; we need @rpath
-# so the plugin uses the same Qt instance that nomacs bundles.
+# Platform-specific linking and post-build
 # -----------------------------------------------------------------------
-set(QT_BREW_PREFIX /opt/homebrew/opt/qtbase/lib)
-
-foreach(_fw Widgets Gui Core)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND install_name_tool -change
-            "${QT_BREW_PREFIX}/Qt${_fw}.framework/Versions/A/Qt${_fw}"
-            "@rpath/Qt${_fw}.framework/Versions/A/Qt${_fw}"
-            "$<TARGET_FILE:${PROJECT_NAME}>"
-        COMMENT "Fixing Qt${_fw} rpath in plugin"
+if(APPLE)
+    target_link_libraries(${PROJECT_NAME}
+        ${QT_LIBS}
+        "-framework CoreFoundation"
+        "${NOMACS_CORE_LIB}"
     )
-endforeach()
+
+    # Fix Qt rpath: Homebrew embeds absolute paths; we need @rpath so the
+    # plugin uses the Qt instance that nomacs bundles.
+    set(QT_BREW_PREFIX /opt/homebrew/opt/qtbase/lib)
+    foreach(_fw Widgets Gui Core)
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND install_name_tool -change
+                "${QT_BREW_PREFIX}/Qt${_fw}.framework/Versions/A/Qt${_fw}"
+                "@rpath/Qt${_fw}.framework/Versions/A/Qt${_fw}"
+                "$<TARGET_FILE:${PROJECT_NAME}>"
+            COMMENT "Fixing Qt${_fw} rpath in plugin"
+        )
+    endforeach()
+
+    # At runtime the plugin is inside the app bundle; @loader_path/../..
+    # reaches the Frameworks directory.
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        INSTALL_RPATH "@loader_path/../../Frameworks"
+        BUILD_WITH_INSTALL_RPATH TRUE
+        MACOSX_RPATH TRUE
+    )
+
+elseif(WIN32)
+    target_link_libraries(${PROJECT_NAME}
+        ${QT_LIBS}
+        Ole32
+        OleAut32
+    )
+    if(NOMACS_CORE_LIB)
+        target_link_libraries(${PROJECT_NAME} "${NOMACS_CORE_LIB}")
+    endif()
+
+    # Suppress MSVC warnings about unsafe CRT functions (nomacs headers use them)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+        _CRT_SECURE_NO_WARNINGS
+        NOMINMAX
+    )
+endif()
 
 # -----------------------------------------------------------------------
-# Install directly into the running nomacs app bundle
+# Install directly into the running nomacs installation
 # -----------------------------------------------------------------------
 install(TARGETS ${PROJECT_NAME}
-    LIBRARY DESTINATION "${NOMACS_PLUGINS_DIR}"
+    LIBRARY DESTINATION "${NOMACS_PLUGINS_DIR}"   # macOS / Linux
+    RUNTIME DESTINATION "${NOMACS_PLUGINS_DIR}"   # Windows DLL
 )

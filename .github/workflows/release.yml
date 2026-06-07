@@ -7,22 +7,18 @@ on:
       - 'v*'
 
 jobs:
-  build:
-    runs-on: macos-14   # Apple Silicon M1 — required; Intel Macs cannot produce arm64 plugins
+  # -----------------------------------------------------------------------
+  # macOS (Apple Silicon)
+  # -----------------------------------------------------------------------
+  build-mac:
+    runs-on: macos-14   # Apple Silicon M1
 
     steps:
       - uses: actions/checkout@v4
 
-      # -----------------------------------------------------------------------
-      # Dependencies
-      # -----------------------------------------------------------------------
       - name: Install build tools
         run: brew install cmake qt
 
-      # -----------------------------------------------------------------------
-      # nomacs app bundle — needed for libnomacsCore and Qt frameworks to link
-      # against at build time.  The zip contains nomacs.app at its root.
-      # -----------------------------------------------------------------------
       - name: Download nomacs 3.22.1 app bundle (arm64)
         run: |
           curl -fsSL \
@@ -34,23 +30,15 @@ jobs:
         run: |
           NOMACS_APP=$(find /tmp/nomacs-app -name "nomacs.app" -maxdepth 3 | head -1)
           if [[ -z "$NOMACS_APP" ]]; then
-            echo "nomacs.app not found in zip"
-            ls -R /tmp/nomacs-app
-            exit 1
+            echo "nomacs.app not found in zip"; ls -R /tmp/nomacs-app; exit 1
           fi
           echo "NOMACS_APP=$NOMACS_APP" >> "$GITHUB_ENV"
 
-      # -----------------------------------------------------------------------
-      # nomacs source — headers only; checkout the exact commit shipped in 3.22.1
-      # -----------------------------------------------------------------------
       - name: Clone nomacs source at 3.22.1
         run: |
           git clone --depth=1 --branch 3.22.1 \
             https://github.com/nomacs/nomacs.git /tmp/nomacs-src
 
-      # -----------------------------------------------------------------------
-      # Build
-      # -----------------------------------------------------------------------
       - name: Configure CMake
         run: |
           cmake -S . -B build -G "Unix Makefiles" \
@@ -64,11 +52,66 @@ jobs:
       - name: Build
         run: cmake --build build -j4
 
-      # -----------------------------------------------------------------------
-      # Release — attach the dylib to the GitHub Release created by the tag push
-      # -----------------------------------------------------------------------
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: build/libnomacs-decklink.dylib
+          fail_on_unmatched_files: true
+
+  # -----------------------------------------------------------------------
+  # Windows (x64)
+  # -----------------------------------------------------------------------
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.7.*'
+          arch: win64_msvc2019_64
+          cache: true
+
+      - name: Download nomacs 3.22.1 (Windows x64)
+        shell: pwsh
+        run: |
+          $url = "https://github.com/nomacs/nomacs/releases/download/3.22.1/nomacs-3.22.1-8f3dff6f-win-x64-quazip-qt6.zip"
+          Invoke-WebRequest -Uri $url -OutFile "$env:TEMP\nomacs.zip"
+          Expand-Archive -Path "$env:TEMP\nomacs.zip" -DestinationPath "$env:TEMP\nomacs-win"
+          $exe = Get-ChildItem "$env:TEMP\nomacs-win" -Recurse -Filter "nomacs.exe" | Select-Object -First 1
+          $dir = $exe.DirectoryName
+          echo "NOMACS_DIR=$dir" | Out-File -Append $env:GITHUB_ENV
+
+      - name: Generate nomacsCore import library (if .lib not shipped)
+        shell: cmd
+        run: |
+          if not exist "%NOMACS_DIR%\nomacsCore.lib" (
+            if not exist "%NOMACS_DIR%\lib\nomacsCore.lib" (
+              echo Generating nomacsCore.lib from DLL...
+              dumpbin /exports "%NOMACS_DIR%\nomacsCore.dll" > exports.txt
+              powershell -File scripts/make_importlib.ps1 exports.txt nomacsCore "%NOMACS_DIR%\nomacsCore.lib"
+            )
+          )
+
+      - name: Clone nomacs source at 3.22.1
+        run: |
+          git clone --depth=1 --branch 3.22.1 https://github.com/nomacs/nomacs.git C:\nomacs-src
+
+      - name: Configure CMake
+        shell: pwsh
+        run: |
+          cmake -S . -B build -G "Visual Studio 17 2022" -A x64 `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DNOMACS_DIR="$env:NOMACS_DIR" `
+            "-DNOMACS_INCLUDE_DIRECTORY=C:/nomacs-src/ImageLounge/src/DkCore;C:/nomacs-src/ImageLounge/src/DkGui;C:/nomacs-src/ImageLounge/src"
+
+      - name: Build
+        run: cmake --build build --config Release -j4
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/Release/nomacs-decklink.dll
           fail_on_unmatched_files: true

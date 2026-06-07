@@ -25,6 +25,11 @@ jobs:
             "https://github.com/nomacs/nomacs/releases/download/3.22.1/nomacs-3.22.1-8f3dff6f-macOS-15.7.4-arm64-quazip-qt6.zip" \
             -o /tmp/nomacs.zip
           unzip -q /tmp/nomacs.zip -d /tmp/nomacs-app
+          # The outer zip contains nomacs.app.zip — extract the inner zip too
+          INNER_ZIP=$(find /tmp/nomacs-app -name "nomacs.app.zip" | head -1)
+          if [[ -n "$INNER_ZIP" ]]; then
+            unzip -q "$INNER_ZIP" -d /tmp/nomacs-app
+          fi
 
       - name: Locate nomacs.app inside zip
         run: |
@@ -77,7 +82,7 @@ jobs:
       - name: Download nomacs 3.22.1 (Windows x64)
         shell: pwsh
         run: |
-          $url = "https://github.com/nomacs/nomacs/releases/download/3.22.1/nomacs-3.22.1-8f3dff6f-win-x64-quazip-qt6.zip"
+          $url = "https://github.com/nomacs/nomacs/releases/download/3.22.1/nomacs-portable-win.zip"
           Invoke-WebRequest -Uri $url -OutFile "$env:TEMP\nomacs.zip"
           Expand-Archive -Path "$env:TEMP\nomacs.zip" -DestinationPath "$env:TEMP\nomacs-win"
           $exe = Get-ChildItem "$env:TEMP\nomacs-win" -Recurse -Filter "nomacs.exe" | Select-Object -First 1

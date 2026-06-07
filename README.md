@@ -30,13 +30,19 @@ Or download `libnomacs-decklink.dylib` from the [Releases page](https://github.c
 
 **Requirements:** Windows 10/11 x64, [nomacs 3.22.1](https://nomacs.org), [Blackmagic Desktop Video](https://www.blackmagicdesign.com/support).
 
+**Option A — one-liner (PowerShell).** Opens PowerShell and runs the install script, which finds nomacs automatically and places the plugin in the right folder:
+
 ```powershell
 irm https://raw.githubusercontent.com/thatcherfreeman/nomacs-decklink/main/scripts/install.ps1 | iex
 ```
 
-Or download `nomacs-decklink.dll` from the [Releases page](https://github.com/thatcherfreeman/nomacs-decklink/releases/latest) and drop it into `C:\Program Files\nomacs\plugins\nomacs\` yourself.
+**Option B — manual.** Download `nomacs-decklink.dll` from the [Releases page](https://github.com/thatcherfreeman/nomacs-decklink/releases/latest). Then:
 
-Restart nomacs after installing — the plugin appears under **Plugins → DeckLink Output**.
+1. Find your nomacs installation folder. The default is `C:\Program Files\nomacs\`, but if you installed it elsewhere go to **Help → About** in nomacs and note the path shown there.
+2. Inside that folder, create the directory `plugins\nomacs\` if it does not already exist.
+3. Copy `nomacs-decklink.dll` into `plugins\nomacs\`.
+
+Either way, restart nomacs after installing — the plugin appears under **Plugins → DeckLink Output**.
 
 ---
 

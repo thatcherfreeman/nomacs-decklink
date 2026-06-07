@@ -200,30 +200,6 @@ nomacs-decklink_autogen/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/nomacs-decklink_autogen.dir/build.make CMakeFiles/nomacs-decklink_autogen.dir/build
 .PHONY : nomacs-decklink_autogen/fast
 
-Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.o: Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.o
-.PHONY : Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.o
-
-# target to build an object file
-Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/nomacs-decklink.dir/build.make CMakeFiles/nomacs-decklink.dir/Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.o
-.PHONY : Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.o
-
-Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.i: Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.i
-.PHONY : Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.i
-
-# target to preprocess a source file
-Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/nomacs-decklink.dir/build.make CMakeFiles/nomacs-decklink.dir/Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.i
-.PHONY : Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.i
-
-Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.s: Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.s
-.PHONY : Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.s
-
-# target to generate assembly for a file
-Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/nomacs-decklink.dir/build.make CMakeFiles/nomacs-decklink.dir/Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.s
-.PHONY : Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.s
-
 nomacs-decklink_autogen/mocs_compilation.o: nomacs-decklink_autogen/mocs_compilation.cpp.o
 .PHONY : nomacs-decklink_autogen/mocs_compilation.o
 
@@ -368,6 +344,30 @@ src/DkDeckLinkViewPort.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/nomacs-decklink.dir/build.make CMakeFiles/nomacs-decklink.dir/src/DkDeckLinkViewPort.cpp.s
 .PHONY : src/DkDeckLinkViewPort.cpp.s
 
+vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.o: vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.o
+.PHONY : vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.o
+
+# target to build an object file
+vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nomacs-decklink.dir/build.make CMakeFiles/nomacs-decklink.dir/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.o
+.PHONY : vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.o
+
+vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.i: vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.i
+.PHONY : vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.i
+
+# target to preprocess a source file
+vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nomacs-decklink.dir/build.make CMakeFiles/nomacs-decklink.dir/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.i
+.PHONY : vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.i
+
+vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.s: vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.s
+.PHONY : vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.s
+
+# target to generate assembly for a file
+vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/nomacs-decklink.dir/build.make CMakeFiles/nomacs-decklink.dir/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.s
+.PHONY : vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -383,9 +383,6 @@ help:
 	@echo "... nomacs-decklink_autogen"
 	@echo "... nomacs-decklink_autogen_timestamp_deps"
 	@echo "... nomacs-decklink"
-	@echo "... Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.o"
-	@echo "... Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.i"
-	@echo "... Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.s"
 	@echo "... nomacs-decklink_autogen/mocs_compilation.o"
 	@echo "... nomacs-decklink_autogen/mocs_compilation.i"
 	@echo "... nomacs-decklink_autogen/mocs_compilation.s"
@@ -404,6 +401,9 @@ help:
 	@echo "... src/DkDeckLinkViewPort.o"
 	@echo "... src/DkDeckLinkViewPort.i"
 	@echo "... src/DkDeckLinkViewPort.s"
+	@echo "... vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.o"
+	@echo "... vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.i"
+	@echo "... vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.s"
 .PHONY : help
 
 

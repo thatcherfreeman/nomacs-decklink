@@ -179,7 +179,8 @@ cmake --build C:\path\to\nomacs-decklink\build --config Release -j8
 ### macOS install
 
 ```sh
-cmake --install /path/to/nomacs-decklink/build
+cd nomacs-decklink
+cmake --install build
 ```
 
 This copies `libnomacs-decklink.dylib` into `/Applications/nomacs.app/Contents/PlugIns/nomacs/`.
@@ -189,7 +190,8 @@ You do not need `sudo` as long as you own the nomacs app bundle. If you installe
 ### Windows install
 
 ```powershell
-cmake --install C:\path\to\nomacs-decklink\build --config Release
+cd nomacs-decklink
+cmake --install build --config Release
 ```
 
 This copies `nomacs-decklink.dll` into `C:\Program Files\nomacs\plugins\nomacs\`. Run from an elevated prompt if that directory requires admin rights.

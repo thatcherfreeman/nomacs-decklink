@@ -8,3 +8,6 @@ Blackmagic DeckLink SDK*/
 vendor/DeckLinkAPI/Win/include/DeckLinkAPI.h
 vendor/DeckLinkAPI/Win/include/DeckLinkAPI_i.c
 vendor/DeckLinkAPI/Win/include/DeckLinkAPI.tlb
+
+.DS_Store
+*/.DS_Store

@@ -950,14 +950,6 @@ nomacs-decklink_autogen/timestamp: /Applications/Xcode.app/Contents/Developer/Pl
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/__stdarg_va_list.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/limits.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/stdarg.h \
-  /Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPI.h \
-  /Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPIConfiguration.h \
-  /Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPIDeckControl.h \
-  /Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPIDiscovery.h \
-  /Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPIDispatch.cpp \
-  /Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPIModes.h \
-  /Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPIStreaming.h \
-  /Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPITypes.h \
   /Users/thatcher/coding/nomacs-decklink/CMakeLists.txt \
   CMakeFiles/4.3.3/CMakeCCompiler.cmake \
   CMakeFiles/4.3.3/CMakeCXXCompiler.cmake \
@@ -967,12 +959,21 @@ nomacs-decklink_autogen/timestamp: /Applications/Xcode.app/Contents/Developer/Pl
   /Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkDialog.h \
   /Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkOutput.cpp \
   /Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkOutput.h \
+  /Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkPlatform.h \
   /Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkPlugin.cpp \
   /Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkPlugin.h \
   /Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkPlugin.json \
   /Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkViewPort.cpp \
   /Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkViewPort.h \
   /Users/thatcher/coding/nomacs-decklink/src/nomacsPlugin.qrc \
+  /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPI.h \
+  /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIConfiguration.h \
+  /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDeckControl.h \
+  /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDiscovery.h \
+  /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp \
+  /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIModes.h \
+  /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIStreaming.h \
+  /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPITypes.h \
   /Users/thatcher/coding/nomacs/ImageLounge/src/DkCore/DkBatchInfo.h \
   /Users/thatcher/coding/nomacs/ImageLounge/src/DkCore/DkFileInfo.h \
   /Users/thatcher/coding/nomacs/ImageLounge/src/DkCore/DkImageContainer.h \
@@ -1796,6 +1797,8 @@ nomacs-decklink_autogen/timestamp: /Applications/Xcode.app/Contents/Developer/Pl
 
 /opt/homebrew/lib/cmake/Qt6/QtPublicAppleHelpers.cmake:
 
+/opt/homebrew/lib/cmake/Qt6/QtPublicAndroidHelpers.cmake:
+
 /opt/homebrew/lib/cmake/Qt6/QtInstallPaths.cmake:
 
 /opt/homebrew/lib/cmake/Qt6/QtFeature.cmake:
@@ -1807,8 +1810,6 @@ nomacs-decklink_autogen/timestamp: /Applications/Xcode.app/Contents/Developer/Pl
 /opt/homebrew/lib/cmake/Qt6/Qt6Targets.cmake:
 
 /opt/homebrew/lib/cmake/Qt6/Qt6ConfigVersion.cmake:
-
-/opt/homebrew/lib/cmake/Qt6/Qt6Config.cmake:
 
 /opt/homebrew/lib/cmake/Qt6/FindWrapOpenGL.cmake:
 
@@ -1847,8 +1848,6 @@ nomacs-decklink_autogen/timestamp: /Applications/Xcode.app/Contents/Developer/Pl
 /opt/homebrew/Cellar/qtbase/6.11.1/lib/QtWidgets.framework/Versions/A/Headers/qabstractbutton.h:
 
 /opt/homebrew/Cellar/qtbase/6.11.1/lib/QtWidgets.framework/Versions/A/Headers/QWidget:
-
-/opt/homebrew/Cellar/qtbase/6.11.1/lib/QtWidgets.framework/Versions/A/Headers/QPushButton:
 
 /opt/homebrew/Cellar/qtbase/6.11.1/lib/QtWidgets.framework/Versions/A/Headers/QMainWindow:
 
@@ -2160,6 +2159,22 @@ nomacs-decklink_autogen/timestamp: /Applications/Xcode.app/Contents/Developer/Pl
 
 /Users/thatcher/coding/nomacs/ImageLounge/src/DkCore/DkBatchInfo.h:
 
+/opt/homebrew/Cellar/qtbase/6.11.1/lib/QtWidgets.framework/Versions/A/Headers/QPushButton:
+
+/Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPITypes.h:
+
+/opt/homebrew/lib/cmake/Qt6/Qt6Config.cmake:
+
+/Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIStreaming.h:
+
+/Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIModes.h:
+
+/Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp:
+
+/Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDiscovery.h:
+
+/Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPI.h:
+
 /Users/thatcher/coding/nomacs-decklink/src/nomacsPlugin.qrc:
 
 /Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkViewPort.h:
@@ -2170,6 +2185,8 @@ nomacs-decklink_autogen/timestamp: /Applications/Xcode.app/Contents/Developer/Pl
 
 /Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkPlugin.json:
 
+/Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkPlatform.h:
+
 /opt/homebrew/share/cmake/Modules/FindThreads.cmake:
 
 /Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkDialog.cpp:
@@ -2179,16 +2196,6 @@ nomacs-decklink_autogen/moc_predefs.h:
 CMakeFiles/4.3.3/CMakeSystem.cmake:
 
 CMakeFiles/4.3.3/CMakeCCompiler.cmake:
-
-/Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPITypes.h:
-
-/Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPIStreaming.h:
-
-/Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPIDeckControl.h:
-
-/opt/homebrew/lib/cmake/Qt6/QtPublicAndroidHelpers.cmake:
-
-/Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPIConfiguration.h:
 
 /opt/homebrew/lib/cmake/Qt6Gui/Qt6QMacHeifPluginConfig.cmake:
 
@@ -3756,8 +3763,6 @@ CMakeFiles/4.3.3/CMakeCCompiler.cmake:
 
 /opt/homebrew/lib/cmake/Qt6Gui/Qt6QICNSPluginAdditionalTargetInfo.cmake:
 
-/Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPIDispatch.cpp:
-
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_remove_copy.h:
 
 /opt/homebrew/Cellar/qtbase/6.11.1/lib/QtGui.framework/Versions/A/Headers/qpixmap.h:
@@ -3807,6 +3812,8 @@ CMakeFiles/4.3.3/CMakeCCompiler.cmake:
 /opt/homebrew/Cellar/qtbase/6.11.1/lib/QtCore.framework/Versions/A/Headers/qarraydata.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__assert:
+
+/Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIConfiguration.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/unwrap_iter.h:
 
@@ -3861,8 +3868,6 @@ CMakeFiles/4.3.3/CMakeCCompiler.cmake:
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/_types/_int32_t.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/sift_down.h:
-
-/Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPI.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/pstl_merge.h:
 
@@ -4149,8 +4154,6 @@ CMakeFiles/4.3.3/CMakeCCompiler.cmake:
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__mbstate_t.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/lexicographical_compare.h:
-
-/Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPIModes.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__availability:
 
@@ -4492,8 +4495,6 @@ CMakeFiles/4.3.3/CMakeCXXCompiler.cmake:
 
 /opt/homebrew/Cellar/qtbase/6.11.1/lib/QtCore.framework/Versions/A/Headers/qstringlist.h:
 
-/Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPIDiscovery.h:
-
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/is_heap.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/_types/_u_int8_t.h:
@@ -4505,6 +4506,8 @@ CMakeFiles/4.3.3/CMakeCXXCompiler.cmake:
 /opt/homebrew/Cellar/qtbase/6.11.1/lib/QtCore.framework/Versions/A/Headers/qmargins.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/ranges_merge.h:
+
+/Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDeckControl.h:
 
 /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/for_each.h:
 

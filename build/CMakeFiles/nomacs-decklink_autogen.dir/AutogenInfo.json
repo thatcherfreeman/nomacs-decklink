@@ -430,6 +430,12 @@
 			null
 		],
 		[
+			"/Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkPlatform.h",
+			"Mu",
+			"UVLADIE3JM/moc_DkDeckLinkPlatform.cpp",
+			null
+		],
+		[
 			"/Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkPlugin.h",
 			"Mu",
 			"UVLADIE3JM/moc_DkDeckLinkPlugin.cpp",
@@ -465,7 +471,7 @@
 	],
 	"MOC_INCLUDES" : 
 	[
-		"/Users/thatcher/coding/nomacs-decklink/Blackmagic DeckLink SDK 16.0/Mac/include",
+		"/Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include",
 		"/Users/thatcher/coding/nomacs/ImageLounge/src/DkCore",
 		"/Users/thatcher/coding/nomacs/ImageLounge/src/DkGui",
 		"/Users/thatcher/coding/nomacs/ImageLounge/src",
@@ -517,11 +523,6 @@
 	"SOURCES" : 
 	[
 		[
-			"/Users/thatcher/coding/nomacs-decklink/Blackmagic DeckLink SDK 16.0/Mac/include/DeckLinkAPIDispatch.cpp",
-			"Mu",
-			null
-		],
-		[
 			"/Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkDialog.cpp",
 			"Mu",
 			null
@@ -538,6 +539,11 @@
 		],
 		[
 			"/Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkViewPort.cpp",
+			"Mu",
+			null
+		],
+		[
+			"/Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp",
 			"Mu",
 			null
 		]

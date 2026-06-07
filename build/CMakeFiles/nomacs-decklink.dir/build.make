@@ -154,19 +154,19 @@ CMakeFiles/nomacs-decklink.dir/src/DkDeckLinkDialog.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/nomacs-decklink.dir/src/DkDeckLinkDialog.cpp.s"
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkDialog.cpp -o CMakeFiles/nomacs-decklink.dir/src/DkDeckLinkDialog.cpp.s
 
-CMakeFiles/nomacs-decklink.dir/Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.o: CMakeFiles/nomacs-decklink.dir/flags.make
-CMakeFiles/nomacs-decklink.dir/Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.o: /Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPIDispatch.cpp
-CMakeFiles/nomacs-decklink.dir/Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.o: CMakeFiles/nomacs-decklink.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/thatcher/coding/nomacs-decklink/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/nomacs-decklink.dir/Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/nomacs-decklink.dir/Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.o -MF CMakeFiles/nomacs-decklink.dir/Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.o.d -o CMakeFiles/nomacs-decklink.dir/Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.o -c "/Users/thatcher/coding/nomacs-decklink/Blackmagic DeckLink SDK 16.0/Mac/include/DeckLinkAPIDispatch.cpp"
+CMakeFiles/nomacs-decklink.dir/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.o: CMakeFiles/nomacs-decklink.dir/flags.make
+CMakeFiles/nomacs-decklink.dir/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.o: /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp
+CMakeFiles/nomacs-decklink.dir/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.o: CMakeFiles/nomacs-decklink.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/thatcher/coding/nomacs-decklink/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/nomacs-decklink.dir/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.o"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/nomacs-decklink.dir/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.o -MF CMakeFiles/nomacs-decklink.dir/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.o.d -o CMakeFiles/nomacs-decklink.dir/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.o -c /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp
 
-CMakeFiles/nomacs-decklink.dir/Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/nomacs-decklink.dir/Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "/Users/thatcher/coding/nomacs-decklink/Blackmagic DeckLink SDK 16.0/Mac/include/DeckLinkAPIDispatch.cpp" > CMakeFiles/nomacs-decklink.dir/Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.i
+CMakeFiles/nomacs-decklink.dir/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/nomacs-decklink.dir/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.i"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp > CMakeFiles/nomacs-decklink.dir/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.i
 
-CMakeFiles/nomacs-decklink.dir/Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/nomacs-decklink.dir/Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "/Users/thatcher/coding/nomacs-decklink/Blackmagic DeckLink SDK 16.0/Mac/include/DeckLinkAPIDispatch.cpp" -o CMakeFiles/nomacs-decklink.dir/Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.s
+CMakeFiles/nomacs-decklink.dir/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/nomacs-decklink.dir/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.s"
+	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp -o CMakeFiles/nomacs-decklink.dir/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.s
 
 CMakeFiles/nomacs-decklink.dir/qrc_nomacsPlugin.cpp.o: CMakeFiles/nomacs-decklink.dir/flags.make
 CMakeFiles/nomacs-decklink.dir/qrc_nomacsPlugin.cpp.o: qrc_nomacsPlugin.cpp
@@ -189,7 +189,7 @@ nomacs__decklink_OBJECTS = \
 "CMakeFiles/nomacs-decklink.dir/src/DkDeckLinkViewPort.cpp.o" \
 "CMakeFiles/nomacs-decklink.dir/src/DkDeckLinkOutput.cpp.o" \
 "CMakeFiles/nomacs-decklink.dir/src/DkDeckLinkDialog.cpp.o" \
-"CMakeFiles/nomacs-decklink.dir/Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.o" \
+"CMakeFiles/nomacs-decklink.dir/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.o" \
 "CMakeFiles/nomacs-decklink.dir/qrc_nomacsPlugin.cpp.o"
 
 # External object files for target nomacs-decklink
@@ -200,7 +200,7 @@ libnomacs-decklink.dylib: CMakeFiles/nomacs-decklink.dir/src/DkDeckLinkPlugin.cp
 libnomacs-decklink.dylib: CMakeFiles/nomacs-decklink.dir/src/DkDeckLinkViewPort.cpp.o
 libnomacs-decklink.dylib: CMakeFiles/nomacs-decklink.dir/src/DkDeckLinkOutput.cpp.o
 libnomacs-decklink.dylib: CMakeFiles/nomacs-decklink.dir/src/DkDeckLinkDialog.cpp.o
-libnomacs-decklink.dylib: CMakeFiles/nomacs-decklink.dir/Blackmagic_DeckLink_SDK_16.0/Mac/include/DeckLinkAPIDispatch.cpp.o
+libnomacs-decklink.dylib: CMakeFiles/nomacs-decklink.dir/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDispatch.cpp.o
 libnomacs-decklink.dylib: CMakeFiles/nomacs-decklink.dir/qrc_nomacsPlugin.cpp.o
 libnomacs-decklink.dylib: CMakeFiles/nomacs-decklink.dir/build.make
 libnomacs-decklink.dylib: /opt/homebrew/lib/QtWidgets.framework/Versions/A/QtWidgets

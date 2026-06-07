@@ -950,14 +950,14 @@
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/__stdarg_va_list.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/limits.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include/stdarg.h \
-  /Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPI.h \
-  /Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPIConfiguration.h \
-  /Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPIDeckControl.h \
-  /Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPIDiscovery.h \
-  /Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPIModes.h \
-  /Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPIStreaming.h \
-  /Users/thatcher/coding/nomacs-decklink/Blackmagic\ DeckLink\ SDK\ 16.0/Mac/include/DeckLinkAPITypes.h \
   /Users/thatcher/coding/nomacs-decklink/src/DkDeckLinkOutput.h \
+  /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPI.h \
+  /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIConfiguration.h \
+  /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDeckControl.h \
+  /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIDiscovery.h \
+  /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIModes.h \
+  /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPIStreaming.h \
+  /Users/thatcher/coding/nomacs-decklink/vendor/DeckLinkAPI/Mac/include/DeckLinkAPITypes.h \
   /Users/thatcher/coding/nomacs/ImageLounge/src/DkCore/DkBatchInfo.h \
   /Users/thatcher/coding/nomacs/ImageLounge/src/DkCore/DkFileInfo.h \
   /Users/thatcher/coding/nomacs/ImageLounge/src/DkCore/DkImageContainer.h \

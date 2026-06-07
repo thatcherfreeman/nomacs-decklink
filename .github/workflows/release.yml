@@ -12,6 +12,8 @@ jobs:
   # -----------------------------------------------------------------------
   build-mac:
     runs-on: macos-14   # Apple Silicon M1
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -68,9 +70,16 @@ jobs:
   # -----------------------------------------------------------------------
   build-windows:
     runs-on: windows-latest
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up MSVC developer environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v4

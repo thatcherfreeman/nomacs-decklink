@@ -29,19 +29,23 @@ namespace nmc
 static long computeRowBytes(long width, BMDPixelFormat fmt)
 {
     switch (fmt) {
-    case bmdFormat8BitBGRA:  return width * 4;
-    case bmdFormat10BitRGB:  return width * 4; // 1 32-bit word per pixel
-    case bmdFormat8BitYUV:   return ((width + 1) / 2) * 4; // Cb+Y0+Cr+Y1 per pair
-    case bmdFormat10BitYUV:  return ((width + 47) / 48) * 128; // v210: ceil(w/48)*128 bytes
-    default:                 return width * 4;
+    case bmdFormat8BitBGRA:    return width * 4;
+    case bmdFormat10BitRGB:    return width * 4;           // 1 32-bit word per pixel
+    case bmdFormat12BitRGB:
+    case bmdFormat12BitRGBLE:  return ((width + 1) / 2) * 9; // 2 pixels per 9-byte block
+    case bmdFormat8BitYUV:     return ((width + 1) / 2) * 4; // Cb+Y0+Cr+Y1 per pair
+    case bmdFormat10BitYUV:    return ((width + 47) / 48) * 128; // v210: ceil(w/48)*128 bytes
+    default:                   return width * 4;
     }
 }
 
 static const QVector<DkPixelFormatInfo> kAllFormats = {
-    { bmdFormat8BitBGRA, QStringLiteral("8-bit RGBA")             },
-    { bmdFormat10BitRGB, QStringLiteral("10-bit RGB (r210)")       },
-    { bmdFormat8BitYUV,  QStringLiteral("8-bit YUV 4:2:2 (2vuy)") },
-    { bmdFormat10BitYUV, QStringLiteral("10-bit YUV 4:2:2 (v210)")},
+    { bmdFormat8BitBGRA,   QStringLiteral("8-bit RGBA")              },
+    { bmdFormat10BitRGB,   QStringLiteral("10-bit RGB (r210)")        },
+    { bmdFormat12BitRGB,   QStringLiteral("12-bit RGB (R12B)")        },
+    { bmdFormat12BitRGBLE, QStringLiteral("12-bit RGB LE (R12L)")     },
+    { bmdFormat8BitYUV,    QStringLiteral("8-bit YUV 4:2:2 (2vuy)")  },
+    { bmdFormat10BitYUV,   QStringLiteral("10-bit YUV 4:2:2 (v210)") },
 };
 
 IDeckLink *DkDeckLinkOutput::getDevice(int index)
@@ -443,10 +447,12 @@ void DkDeckLinkOutput::fillFrame(IDeckLinkMutableVideoFrame *frame, const QImage
     }
 
     switch (mConfig.pixelFormat) {
-    case bmdFormat8BitBGRA: fillBGRA8(dst, rowBytes, canvas); break;
-    case bmdFormat10BitRGB: fillRGB10(dst, rowBytes, canvas); break;
-    case bmdFormat8BitYUV:  fillYUV8 (dst, rowBytes, canvas); break;
-    case bmdFormat10BitYUV: fillYUV10(dst, rowBytes, canvas); break;
+    case bmdFormat8BitBGRA:   fillBGRA8  (dst, rowBytes, canvas); break;
+    case bmdFormat10BitRGB:   fillRGB10  (dst, rowBytes, canvas); break;
+    case bmdFormat12BitRGB:   fillRGB12  (dst, rowBytes, canvas); break;
+    case bmdFormat12BitRGBLE: fillRGB12LE(dst, rowBytes, canvas); break;
+    case bmdFormat8BitYUV:    fillYUV8   (dst, rowBytes, canvas); break;
+    case bmdFormat10BitYUV:   fillYUV10  (dst, rowBytes, canvas); break;
     default: break;
     }
 
@@ -535,6 +541,114 @@ void DkDeckLinkOutput::fillRGB10(void *dst, long rowBytes, const QImage &src) co
             p[1] = static_cast<uint8_t>((word >> 16) & 0xFF);
             p[2] = static_cast<uint8_t>((word >>  8) & 0xFF);
             p[3] = static_cast<uint8_t>((word      ) & 0xFF);
+        }
+    }
+}
+
+// -----------------------------------------------------------------------
+// fillRGB12 / fillRGB12LE — bmdFormat12BitRGB (R12B) / bmdFormat12BitRGBLE (R12L)
+//
+// Both formats pack 2 pixels (R0,G0,B0, R1,G1,B1) into 9 bytes (72 bits).
+//
+// R12B — big-endian, R0 in the most-significant bits:
+//   byte 0: R0[11:4]
+//   byte 1: R0[3:0]  G0[11:8]
+//   byte 2: G0[7:0]
+//   byte 3: B0[11:4]
+//   byte 4: B0[3:0]  R1[11:8]
+//   byte 5: R1[7:0]
+//   byte 6: G1[11:4]
+//   byte 7: G1[3:0]  B1[11:8]
+//   byte 8: B1[7:0]
+//
+// R12L — little-endian (B1 in the least-significant bits):
+//   byte 0: B1[7:0]
+//   byte 1: G1[3:0]  B1[11:8]
+//   byte 2: G1[11:4]
+//   byte 3: R1[7:0]
+//   byte 4: B0[3:0]  R1[11:8]
+//   byte 5: B0[11:4]
+//   byte 6: G0[7:0]
+//   byte 7: R0[3:0]  G0[11:8]
+//   byte 8: R0[11:4]
+//
+// Legal range (SMPTE 12-bit): 256–3760 (= 64–940 scaled ×4).
+// Full range: expand 8→12 bit by replicating the top nibble into the bottom.
+// -----------------------------------------------------------------------
+
+static inline uint32_t expand8to12(int v8, bool legal)
+{
+    if (legal)
+        return static_cast<uint32_t>(256 + (v8 * 3504 + 127) / 255);
+    return static_cast<uint32_t>((v8 << 4) | (v8 >> 4));
+}
+
+void DkDeckLinkOutput::fillRGB12(void *dst, long rowBytes, const QImage &src) const
+{
+    const int w = src.width();
+    const int h = src.height();
+    const bool legal = mConfig.legalRange;
+
+    for (int y = 0; y < h; ++y) {
+        const QRgb *srcRow = reinterpret_cast<const QRgb *>(src.constScanLine(y));
+        uint8_t *dstRow = static_cast<uint8_t *>(dst) + y * rowBytes;
+
+        for (int x = 0; x < w; x += 2) {
+            const QRgb px0 = srcRow[x];
+            const QRgb px1 = (x + 1 < w) ? srcRow[x + 1] : px0;
+
+            const uint32_t R0 = expand8to12(qRed(px0),   legal);
+            const uint32_t G0 = expand8to12(qGreen(px0), legal);
+            const uint32_t B0 = expand8to12(qBlue(px0),  legal);
+            const uint32_t R1 = expand8to12(qRed(px1),   legal);
+            const uint32_t G1 = expand8to12(qGreen(px1), legal);
+            const uint32_t B1 = expand8to12(qBlue(px1),  legal);
+
+            uint8_t *p = dstRow + (x / 2) * 9;
+            p[0] = static_cast<uint8_t>(R0 >> 4);
+            p[1] = static_cast<uint8_t>((R0 & 0xF) << 4 | G0 >> 8);
+            p[2] = static_cast<uint8_t>(G0 & 0xFF);
+            p[3] = static_cast<uint8_t>(B0 >> 4);
+            p[4] = static_cast<uint8_t>((B0 & 0xF) << 4 | R1 >> 8);
+            p[5] = static_cast<uint8_t>(R1 & 0xFF);
+            p[6] = static_cast<uint8_t>(G1 >> 4);
+            p[7] = static_cast<uint8_t>((G1 & 0xF) << 4 | B1 >> 8);
+            p[8] = static_cast<uint8_t>(B1 & 0xFF);
+        }
+    }
+}
+
+void DkDeckLinkOutput::fillRGB12LE(void *dst, long rowBytes, const QImage &src) const
+{
+    const int w = src.width();
+    const int h = src.height();
+    const bool legal = mConfig.legalRange;
+
+    for (int y = 0; y < h; ++y) {
+        const QRgb *srcRow = reinterpret_cast<const QRgb *>(src.constScanLine(y));
+        uint8_t *dstRow = static_cast<uint8_t *>(dst) + y * rowBytes;
+
+        for (int x = 0; x < w; x += 2) {
+            const QRgb px0 = srcRow[x];
+            const QRgb px1 = (x + 1 < w) ? srcRow[x + 1] : px0;
+
+            const uint32_t R0 = expand8to12(qRed(px0),   legal);
+            const uint32_t G0 = expand8to12(qGreen(px0), legal);
+            const uint32_t B0 = expand8to12(qBlue(px0),  legal);
+            const uint32_t R1 = expand8to12(qRed(px1),   legal);
+            const uint32_t G1 = expand8to12(qGreen(px1), legal);
+            const uint32_t B1 = expand8to12(qBlue(px1),  legal);
+
+            uint8_t *p = dstRow + (x / 2) * 9;
+            p[0] = static_cast<uint8_t>(B1 & 0xFF);
+            p[1] = static_cast<uint8_t>((G1 & 0xF) << 4 | B1 >> 8);
+            p[2] = static_cast<uint8_t>(G1 >> 4);
+            p[3] = static_cast<uint8_t>(R1 & 0xFF);
+            p[4] = static_cast<uint8_t>((B0 & 0xF) << 4 | R1 >> 8);
+            p[5] = static_cast<uint8_t>(B0 >> 4);
+            p[6] = static_cast<uint8_t>(G0 & 0xFF);
+            p[7] = static_cast<uint8_t>((R0 & 0xF) << 4 | G0 >> 8);
+            p[8] = static_cast<uint8_t>(R0 >> 4);
         }
     }
 }

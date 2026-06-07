@@ -87,10 +87,12 @@ public:
 private:
     void fillFrame(IDeckLinkMutableVideoFrame *frame, const QImage &src);
 
-    void fillBGRA8(void *dst, long rowBytes, const QImage &src) const;
-    void fillRGB10(void *dst, long rowBytes, const QImage &src) const;
-    void fillYUV8(void *dst, long rowBytes, const QImage &src) const;
-    void fillYUV10(void *dst, long rowBytes, const QImage &src) const;
+    void fillBGRA8  (void *dst, long rowBytes, const QImage &src) const;
+    void fillRGB10  (void *dst, long rowBytes, const QImage &src) const;
+    void fillRGB12  (void *dst, long rowBytes, const QImage &src) const;
+    void fillRGB12LE(void *dst, long rowBytes, const QImage &src) const;
+    void fillYUV8   (void *dst, long rowBytes, const QImage &src) const;
+    void fillYUV10  (void *dst, long rowBytes, const QImage &src) const;
 
     static IDeckLink *getDevice(int index);
 

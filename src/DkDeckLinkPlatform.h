@@ -12,6 +12,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 
 using BMDString = CFStringRef;
+using BMDBool   = bool;
 
 static inline QString bmdStringToQString(BMDString s)
 {
@@ -34,6 +35,7 @@ static inline void bmdPlatformUninit() {}
 #include <oleauto.h>   // SysStringLen / SysFreeString
 
 using BMDString = BSTR;
+using BMDBool   = BOOL;
 
 static inline QString bmdStringToQString(BMDString s)
 {

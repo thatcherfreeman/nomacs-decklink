@@ -20,6 +20,20 @@ The easiest way to install — no compiler required.
 
 **Requirements:** Apple Silicon Mac, [nomacs 3.22.1](https://nomacs.org), [Blackmagic Desktop Video](https://www.blackmagicdesign.com/support).
 
+#### Install nomacs
+
+Download the latest release from the [nomacs GitHub releases page](https://github.com/nomacs/nomacs/releases/latest). Grab the `nomacs-…-macOS-…-arm64-….zip`, unzip it, and drag `nomacs.app` into `/Applications`.
+
+macOS Gatekeeper will block it on first launch because it is not notarised by Apple. To clear the quarantine flag, run this in Terminal after dragging the app to `/Applications`:
+
+```sh
+xattr -dr com.apple.quarantine /Applications/nomacs.app
+```
+
+Then double-click the app normally — it will open without the "malware" warning.
+
+#### Install the plugin
+
 ```sh
 curl -fsSL https://raw.githubusercontent.com/thatcherfreeman/nomacs-decklink/main/scripts/install.sh | bash
 ```

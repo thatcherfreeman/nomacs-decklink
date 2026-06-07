@@ -17,7 +17,7 @@ namespace nmc
 // -----------------------------------------------------------------------
 
 struct DkDisplayModeInfo {
-    BMDDisplayMode mode = 0;
+    BMDDisplayMode mode = bmdModeUnknown;
     QString name;
     long width = 0;
     long height = 0;

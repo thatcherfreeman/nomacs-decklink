@@ -1,6 +1,14 @@
 #include "DkDeckLinkOutput.h"
 #include "DkDeckLinkPlatform.h"
 
+#ifdef _WIN32
+// midl-generated DeckLinkAPI.h does not declare these; DeckLinkAPIDispatch.cpp defines them.
+IDeckLinkIterator* CreateDeckLinkIteratorInstance();
+IDeckLinkAPIInformation* CreateDeckLinkAPIInformationInstance();
+IDeckLinkVideoConversion* CreateVideoConversionInstance();
+IDeckLinkDiscovery* CreateDeckLinkDiscoveryInstance();
+#endif
+
 #include <QDebug>
 #include <algorithm>
 #include <cstring>
@@ -105,7 +113,7 @@ QVector<DkDisplayModeInfo> DkDeckLinkOutput::enumerateModes(int deviceIndex)
             bool accepted = false;
             for (const auto &fmt : kAllFormats) {
                 BMDDisplayMode actualMode = bmdModeUnknown;
-                bool supported = false;
+                BMDBool supported = 0;
                 output->DoesSupportVideoMode(bmdVideoConnectionUnspecified,
                                              modeObj->GetDisplayMode(),
                                              fmt.format,
@@ -157,7 +165,7 @@ QVector<DkPixelFormatInfo> DkDeckLinkOutput::enumerateFormats(int deviceIndex, B
 
     for (const auto &fmt : kAllFormats) {
         BMDDisplayMode actualMode = bmdModeUnknown;
-        bool supported = false;
+        BMDBool supported = 0;
         output->DoesSupportVideoMode(bmdVideoConnectionUnspecified,
                                      displayMode,
                                      fmt.format,
@@ -180,7 +188,7 @@ bool DkDeckLinkOutput::supportsDualLink(int deviceIndex)
         return false;
 
     IDeckLinkProfileAttributes *attrs = nullptr;
-    bool dual = false;
+    BMDBool dual = 0;
     if (device->QueryInterface(IID_IDeckLinkProfileAttributes,
                                 reinterpret_cast<void **>(&attrs)) == S_OK) {
         attrs->GetFlag(BMDDeckLinkSupportsDualLinkSDI, &dual);

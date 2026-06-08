@@ -7,7 +7,7 @@
 #include <QVector>
 #include <atomic>
 
-#include "DeckLinkAPI.h"
+#include "DkDeckLinkCompat.h"
 
 namespace nmc
 {
@@ -101,7 +101,7 @@ private:
     static IDeckLink *getDevice(int index);
 
     IDeckLink *mDeckLink = nullptr;
-    IDeckLinkOutput *mDeckLinkOutput = nullptr;
+    DkOutputInterface mDeckLinkOutput;
     IDeckLinkMutableVideoFrame *mFrame = nullptr;
 
     DkOutputConfig mConfig;

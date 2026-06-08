@@ -54,7 +54,7 @@ Download the latest release from the [nomacs GitHub releases page](https://githu
 macOS Gatekeeper will block it on first launch because it is not notarised by Apple. To clear the quarantine flag, run this in Terminal after dragging the app to `/Applications`:
 
 ```sh
-xattr -dr com.apple.quarantine /Applications/nomacs.app
+sudo xattr -dr com.apple.quarantine /Applications/nomacs.app
 ```
 
 Then double-click the app normally — it will open without the "malware" warning.

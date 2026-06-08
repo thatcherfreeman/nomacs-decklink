@@ -91,16 +91,25 @@ struct FrameWriteBuffer {
     FrameWriteBuffer &operator=(const FrameWriteBuffer &) = delete;
 };
 
-static IDeckLinkOutput *queryOutput(IDeckLink *device)
+static DkOutputInterface queryOutput(IDeckLink *device)
 {
-    IDeckLinkOutput *out = nullptr;
+    DkOutputInterface iface;
+    IDeckLinkOutput *out16 = nullptr;
     if (device->QueryInterface(IID_IDeckLinkOutput,
-                                reinterpret_cast<void **>(&out)) == S_OK)
-        return out;
-    void *out153 = nullptr;
-    if (device->QueryInterface(IID_IDeckLinkOutput_v15_3_1, &out153) == S_OK)
-        return reinterpret_cast<IDeckLinkOutput *>(out153);
-    return nullptr;
+                                reinterpret_cast<void **>(&out16)) == S_OK) {
+        iface.v16 = out16;
+        return iface;
+    }
+    void *p = nullptr;
+    if (device->QueryInterface(IID_IDeckLinkOutput_v15_3_1, &p) == S_OK) {
+        iface.v16 = reinterpret_cast<IDeckLinkOutput *>(p);
+        return iface;
+    }
+    IDeckLinkOutput_v14_2_1 *out14 = nullptr;
+    if (device->QueryInterface(IID_IDeckLinkOutput_v14_2_1,
+                                reinterpret_cast<void **>(&out14)) == S_OK)
+        iface.v14 = out14;
+    return iface;
 }
 
 static IDeckLinkConfiguration *queryConfig(IDeckLink *device)
@@ -109,9 +118,15 @@ static IDeckLinkConfiguration *queryConfig(IDeckLink *device)
     if (device->QueryInterface(IID_IDeckLinkConfiguration,
                                 reinterpret_cast<void **>(&cfg)) == S_OK)
         return cfg;
-    void *cfg153 = nullptr;
-    if (device->QueryInterface(IID_IDeckLinkConfiguration_v15_3_1, &cfg153) == S_OK)
-        return reinterpret_cast<IDeckLinkConfiguration *>(cfg153);
+    void *p = nullptr;
+    if (device->QueryInterface(IID_IDeckLinkConfiguration_v15_3_1, &p) == S_OK)
+        return reinterpret_cast<IDeckLinkConfiguration *>(p);
+    if (device->QueryInterface(IID_IDeckLinkConfiguration_v10_11, &p) == S_OK)
+        return reinterpret_cast<IDeckLinkConfiguration *>(p);
+    if (device->QueryInterface(IID_IDeckLinkConfiguration_v10_9, &p) == S_OK)
+        return reinterpret_cast<IDeckLinkConfiguration *>(p);
+    if (device->QueryInterface(IID_IDeckLinkConfiguration_v10_4, &p) == S_OK)
+        return reinterpret_cast<IDeckLinkConfiguration *>(p);
     return nullptr;
 }
 
@@ -121,9 +136,12 @@ static IDeckLinkProfileAttributes *queryAttributes(IDeckLink *device)
     if (device->QueryInterface(IID_IDeckLinkProfileAttributes,
                                 reinterpret_cast<void **>(&attrs)) == S_OK)
         return attrs;
-    void *attrs153 = nullptr;
-    if (device->QueryInterface(IID_IDeckLinkProfileAttributes_v15_3_1, &attrs153) == S_OK)
-        return reinterpret_cast<IDeckLinkProfileAttributes *>(attrs153);
+    void *p = nullptr;
+    if (device->QueryInterface(IID_IDeckLinkProfileAttributes_v15_3_1, &p) == S_OK)
+        return reinterpret_cast<IDeckLinkProfileAttributes *>(p);
+    // IDeckLinkAttributes is the pre-15.x name for the same interface (identical vtable)
+    if (device->QueryInterface(IID_IDeckLinkAttributes_v10_11, &p) == S_OK)
+        return reinterpret_cast<IDeckLinkProfileAttributes *>(p);
     return nullptr;
 }
 
@@ -182,14 +200,14 @@ QVector<DkDisplayModeInfo> DkDeckLinkOutput::enumerateModes(int deviceIndex)
     if (!device)
         return modes;
 
-    IDeckLinkOutput *output = queryOutput(device);
-    if (!output) {
+    DkOutputInterface output = queryOutput(device);
+    if (!output.valid()) {
         device->Release();
         return modes;
     }
 
     IDeckLinkDisplayModeIterator *modeIt = nullptr;
-    if (output->GetDisplayModeIterator(&modeIt) == S_OK) {
+    if (output.GetDisplayModeIterator(&modeIt) == S_OK) {
         IDeckLinkDisplayMode *modeObj = nullptr;
         while (modeIt->Next(&modeObj) == S_OK) {
             // Accept the mode if the device supports at least one of our formats
@@ -197,12 +215,12 @@ QVector<DkDisplayModeInfo> DkDeckLinkOutput::enumerateModes(int deviceIndex)
             for (const auto &fmt : kAllFormats) {
                 BMDDisplayMode actualMode = bmdModeUnknown;
                 BMDBool supported = 0;
-                output->DoesSupportVideoMode(bmdVideoConnectionUnspecified,
-                                             modeObj->GetDisplayMode(),
-                                             fmt.format,
-                                             bmdNoVideoOutputConversion,
-                                             bmdSupportedVideoModeDefault,
-                                             &actualMode, &supported);
+                output.DoesSupportVideoMode(bmdVideoConnectionUnspecified,
+                                            modeObj->GetDisplayMode(),
+                                            fmt.format,
+                                            bmdNoVideoOutputConversion,
+                                            bmdSupportedVideoModeDefault,
+                                            &actualMode, &supported);
                 if (supported) {
                     accepted = true;
                     break;
@@ -227,7 +245,7 @@ QVector<DkDisplayModeInfo> DkDeckLinkOutput::enumerateModes(int deviceIndex)
         modeIt->Release();
     }
 
-    output->Release();
+    output.release();
     device->Release();
     return modes;
 }
@@ -240,8 +258,8 @@ QVector<DkPixelFormatInfo> DkDeckLinkOutput::enumerateFormats(int deviceIndex, B
     if (!device)
         return result;
 
-    IDeckLinkOutput *output = queryOutput(device);
-    if (!output) {
+    DkOutputInterface output = queryOutput(device);
+    if (!output.valid()) {
         device->Release();
         return result;
     }
@@ -249,17 +267,17 @@ QVector<DkPixelFormatInfo> DkDeckLinkOutput::enumerateFormats(int deviceIndex, B
     for (const auto &fmt : kAllFormats) {
         BMDDisplayMode actualMode = bmdModeUnknown;
         BMDBool supported = 0;
-        output->DoesSupportVideoMode(bmdVideoConnectionUnspecified,
-                                     displayMode,
-                                     fmt.format,
-                                     bmdNoVideoOutputConversion,
-                                     bmdSupportedVideoModeDefault,
-                                     &actualMode, &supported);
+        output.DoesSupportVideoMode(bmdVideoConnectionUnspecified,
+                                    displayMode,
+                                    fmt.format,
+                                    bmdNoVideoOutputConversion,
+                                    bmdSupportedVideoModeDefault,
+                                    &actualMode, &supported);
         if (supported)
             result << fmt;
     }
 
-    output->Release();
+    output.release();
     device->Release();
     return result;
 }
@@ -324,43 +342,40 @@ bool DkDeckLinkOutput::startOutput(const DkOutputConfig &cfg)
     }
 
     mDeckLinkOutput = queryOutput(mDeckLink);
-    if (!mDeckLinkOutput) {
+    if (!mDeckLinkOutput.valid()) {
         mLastError = QStringLiteral("Device does not support video output");
         mDeckLink->Release();
         mDeckLink = nullptr;
         return false;
     }
 
-    if (mDeckLinkOutput->EnableVideoOutput(cfg.mode.mode, bmdVideoOutputFlagDefault) != S_OK) {
+    if (mDeckLinkOutput.EnableVideoOutput(cfg.mode.mode, bmdVideoOutputFlagDefault) != S_OK) {
         mLastError = QStringLiteral("EnableVideoOutput failed");
-        mDeckLinkOutput->Release();
-        mDeckLinkOutput = nullptr;
+        mDeckLinkOutput.release();
         mDeckLink->Release();
         mDeckLink = nullptr;
         return false;
     }
 
-    if (mDeckLinkOutput->SetScheduledFrameCompletionCallback(this) != S_OK) {
+    if (mDeckLinkOutput.SetScheduledFrameCompletionCallback(this) != S_OK) {
         mLastError = QStringLiteral("SetScheduledFrameCompletionCallback failed");
-        mDeckLinkOutput->DisableVideoOutput();
-        mDeckLinkOutput->Release();
-        mDeckLinkOutput = nullptr;
+        mDeckLinkOutput.DisableVideoOutput();
+        mDeckLinkOutput.release();
         mDeckLink->Release();
         mDeckLink = nullptr;
         return false;
     }
 
     const long rowBytes = computeRowBytes(cfg.mode.width, cfg.pixelFormat);
-    if (mDeckLinkOutput->CreateVideoFrame(static_cast<int32_t>(cfg.mode.width),
-                                           static_cast<int32_t>(cfg.mode.height),
-                                           static_cast<int32_t>(rowBytes),
-                                           cfg.pixelFormat,
-                                           bmdFrameFlagDefault,
-                                           &mFrame) != S_OK || !mFrame) {
+    if (mDeckLinkOutput.CreateVideoFrame(static_cast<int32_t>(cfg.mode.width),
+                                          static_cast<int32_t>(cfg.mode.height),
+                                          static_cast<int32_t>(rowBytes),
+                                          cfg.pixelFormat,
+                                          bmdFrameFlagDefault,
+                                          &mFrame) != S_OK || !mFrame) {
         mLastError = QStringLiteral("CreateVideoFrame failed");
-        mDeckLinkOutput->DisableVideoOutput();
-        mDeckLinkOutput->Release();
-        mDeckLinkOutput = nullptr;
+        mDeckLinkOutput.DisableVideoOutput();
+        mDeckLinkOutput.release();
         mDeckLink->Release();
         mDeckLink = nullptr;
         return false;
@@ -380,13 +395,13 @@ bool DkDeckLinkOutput::startOutput(const DkOutputConfig &cfg)
     // Pre-schedule 3 frames to prime the pipeline.
     // Do NOT AddRef here — the SDK AddRefs when scheduling and Releases when completed.
     for (int i = 0; i < 3; ++i) {
-        mDeckLinkOutput->ScheduleVideoFrame(mFrame, mNextFrameTime,
-                                             cfg.mode.frameDuration,
-                                             cfg.mode.timeScale);
+        mDeckLinkOutput.ScheduleVideoFrame(mFrame, mNextFrameTime,
+                                            cfg.mode.frameDuration,
+                                            cfg.mode.timeScale);
         mNextFrameTime += cfg.mode.frameDuration;
     }
 
-    mDeckLinkOutput->StartScheduledPlayback(0, cfg.mode.timeScale, 1.0);
+    mDeckLinkOutput.StartScheduledPlayback(0, cfg.mode.timeScale, 1.0);
     return true;
 }
 
@@ -413,12 +428,11 @@ void DkDeckLinkOutput::stopOutput()
         return;
     mRunning = false;
 
-    if (mDeckLinkOutput) {
-        mDeckLinkOutput->StopScheduledPlayback(0, nullptr, mConfig.mode.timeScale);
-        mDeckLinkOutput->SetScheduledFrameCompletionCallback(nullptr);
-        mDeckLinkOutput->DisableVideoOutput();
-        mDeckLinkOutput->Release();
-        mDeckLinkOutput = nullptr;
+    if (mDeckLinkOutput.valid()) {
+        mDeckLinkOutput.StopScheduledPlayback(0, nullptr, mConfig.mode.timeScale);
+        mDeckLinkOutput.SetScheduledFrameCompletionCallback(nullptr);
+        mDeckLinkOutput.DisableVideoOutput();
+        mDeckLinkOutput.release();
     }
     if (mFrame) {
         mFrame->Release();
@@ -441,7 +455,7 @@ void DkDeckLinkOutput::stopOutput()
 HRESULT DkDeckLinkOutput::ScheduledFrameCompleted(IDeckLinkVideoFrame *completedFrame,
                                                     BMDOutputFrameCompletionResult)
 {
-    if (!mRunning || !mDeckLinkOutput)
+    if (!mRunning || !mDeckLinkOutput.valid())
         return S_OK;
 
     QImage pending;
@@ -463,9 +477,9 @@ HRESULT DkDeckLinkOutput::ScheduledFrameCompleted(IDeckLinkVideoFrame *completed
 
     // Re-schedule the same frame to hold the still image (SDK handles its own ref count)
     if (mFrame)
-        mDeckLinkOutput->ScheduleVideoFrame(mFrame, mNextFrameTime,
-                                             mConfig.mode.frameDuration,
-                                             mConfig.mode.timeScale);
+        mDeckLinkOutput.ScheduleVideoFrame(mFrame, mNextFrameTime,
+                                            mConfig.mode.frameDuration,
+                                            mConfig.mode.timeScale);
     mNextFrameTime += mConfig.mode.frameDuration;
     return S_OK;
 }

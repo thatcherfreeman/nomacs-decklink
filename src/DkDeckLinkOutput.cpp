@@ -1,5 +1,6 @@
 #include "DkDeckLinkOutput.h"
 #include "DkDeckLinkPlatform.h"
+#include "DkDeckLinkCompat.h"
 
 #ifdef _WIN32
 // midl-generated DeckLinkAPI.h does not declare these; DeckLinkAPIDispatch.cpp defines them.
@@ -47,6 +48,84 @@ static const QVector<DkPixelFormatInfo> kAllFormats = {
     { bmdFormat8BitYUV,    QStringLiteral("8-bit YUV 4:2:2 (2vuy)")  },
     { bmdFormat10BitYUV,   QStringLiteral("10-bit YUV 4:2:2 (v210)") },
 };
+
+// -----------------------------------------------------------------------
+// SDK version compatibility helpers
+//
+// SDK 16.0 changed the IIDs for IDeckLinkOutput, IDeckLinkConfiguration,
+// IDeckLinkProfileAttributes, and IDeckLinkVideoBuffer.  On DeckLink Desktop
+// Video 15.x the 16.0 QueryInterface fails; we fall back to the 15.x IIDs.
+// On 15.1 and earlier there is no IDeckLinkVideoBuffer at all — GetBytes
+// lived directly on IDeckLinkVideoFrame (IDeckLinkVideoFrame_v14_2_1).
+// -----------------------------------------------------------------------
+
+// RAII wrapper that locks a frame's write buffer, handling all three SDK eras.
+struct FrameWriteBuffer {
+    void                        *buf     = nullptr;
+    IDeckLinkVideoBuffer        *vbuf    = nullptr;
+    IDeckLinkVideoBuffer_v15_3_1 *vbuf153 = nullptr;
+    IDeckLinkVideoFrame_v14_2_1  *old     = nullptr;
+
+    explicit FrameWriteBuffer(IDeckLinkMutableVideoFrame *frame) {
+        if (frame->QueryInterface(IID_IDeckLinkVideoBuffer,
+                                   reinterpret_cast<void **>(&vbuf)) == S_OK) {
+            vbuf->StartAccess(bmdBufferAccessWrite);
+            vbuf->GetBytes(&buf);
+        } else if (frame->QueryInterface(IID_IDeckLinkVideoBuffer_v15_3_1,
+                                          reinterpret_cast<void **>(&vbuf153)) == S_OK) {
+            vbuf153->StartAccess(bmdBufferAccessWrite);
+            vbuf153->GetBytes(&buf);
+        } else if (frame->QueryInterface(IID_IDeckLinkVideoFrame_v14_2_1,
+                                          reinterpret_cast<void **>(&old)) == S_OK) {
+            old->GetBytes(&buf);
+        }
+    }
+
+    ~FrameWriteBuffer() {
+        if (vbuf)    { vbuf->EndAccess(bmdBufferAccessWrite);    vbuf->Release(); }
+        if (vbuf153) { vbuf153->EndAccess(bmdBufferAccessWrite); vbuf153->Release(); }
+        if (old)     { old->Release(); }
+    }
+
+    FrameWriteBuffer(const FrameWriteBuffer &) = delete;
+    FrameWriteBuffer &operator=(const FrameWriteBuffer &) = delete;
+};
+
+static IDeckLinkOutput *queryOutput(IDeckLink *device)
+{
+    IDeckLinkOutput *out = nullptr;
+    if (device->QueryInterface(IID_IDeckLinkOutput,
+                                reinterpret_cast<void **>(&out)) == S_OK)
+        return out;
+    void *out153 = nullptr;
+    if (device->QueryInterface(IID_IDeckLinkOutput_v15_3_1, &out153) == S_OK)
+        return reinterpret_cast<IDeckLinkOutput *>(out153);
+    return nullptr;
+}
+
+static IDeckLinkConfiguration *queryConfig(IDeckLink *device)
+{
+    IDeckLinkConfiguration *cfg = nullptr;
+    if (device->QueryInterface(IID_IDeckLinkConfiguration,
+                                reinterpret_cast<void **>(&cfg)) == S_OK)
+        return cfg;
+    void *cfg153 = nullptr;
+    if (device->QueryInterface(IID_IDeckLinkConfiguration_v15_3_1, &cfg153) == S_OK)
+        return reinterpret_cast<IDeckLinkConfiguration *>(cfg153);
+    return nullptr;
+}
+
+static IDeckLinkProfileAttributes *queryAttributes(IDeckLink *device)
+{
+    IDeckLinkProfileAttributes *attrs = nullptr;
+    if (device->QueryInterface(IID_IDeckLinkProfileAttributes,
+                                reinterpret_cast<void **>(&attrs)) == S_OK)
+        return attrs;
+    void *attrs153 = nullptr;
+    if (device->QueryInterface(IID_IDeckLinkProfileAttributes_v15_3_1, &attrs153) == S_OK)
+        return reinterpret_cast<IDeckLinkProfileAttributes *>(attrs153);
+    return nullptr;
+}
 
 IDeckLink *DkDeckLinkOutput::getDevice(int index)
 {
@@ -103,8 +182,8 @@ QVector<DkDisplayModeInfo> DkDeckLinkOutput::enumerateModes(int deviceIndex)
     if (!device)
         return modes;
 
-    IDeckLinkOutput *output = nullptr;
-    if (device->QueryInterface(IID_IDeckLinkOutput, reinterpret_cast<void **>(&output)) != S_OK) {
+    IDeckLinkOutput *output = queryOutput(device);
+    if (!output) {
         device->Release();
         return modes;
     }
@@ -161,8 +240,8 @@ QVector<DkPixelFormatInfo> DkDeckLinkOutput::enumerateFormats(int deviceIndex, B
     if (!device)
         return result;
 
-    IDeckLinkOutput *output = nullptr;
-    if (device->QueryInterface(IID_IDeckLinkOutput, reinterpret_cast<void **>(&output)) != S_OK) {
+    IDeckLinkOutput *output = queryOutput(device);
+    if (!output) {
         device->Release();
         return result;
     }
@@ -191,10 +270,9 @@ bool DkDeckLinkOutput::supportsDualLink(int deviceIndex)
     if (!device)
         return false;
 
-    IDeckLinkProfileAttributes *attrs = nullptr;
+    IDeckLinkProfileAttributes *attrs = queryAttributes(device);
     BMDBool dual = 0;
-    if (device->QueryInterface(IID_IDeckLinkProfileAttributes,
-                                reinterpret_cast<void **>(&attrs)) == S_OK) {
+    if (attrs) {
         attrs->GetFlag(BMDDeckLinkSupportsDualLinkSDI, &dual);
         attrs->Release();
     }
@@ -235,9 +313,8 @@ bool DkDeckLinkOutput::startOutput(const DkOutputConfig &cfg)
     }
 
     // Apply output configuration flags
-    IDeckLinkConfiguration *dlCfg = nullptr;
-    if (mDeckLink->QueryInterface(IID_IDeckLinkConfiguration,
-                                   reinterpret_cast<void **>(&dlCfg)) == S_OK) {
+    IDeckLinkConfiguration *dlCfg = queryConfig(mDeckLink);
+    if (dlCfg) {
         dlCfg->SetInt(bmdDeckLinkConfigSDIOutputLinkConfiguration,
                       static_cast<int64_t>(cfg.linkConfig));
         dlCfg->SetFlag(bmdDeckLinkConfigRec2020Output,      cfg.rec2020);
@@ -246,8 +323,8 @@ bool DkDeckLinkOutput::startOutput(const DkOutputConfig &cfg)
         dlCfg->Release();
     }
 
-    if (mDeckLink->QueryInterface(IID_IDeckLinkOutput,
-                                   reinterpret_cast<void **>(&mDeckLinkOutput)) != S_OK) {
+    mDeckLinkOutput = queryOutput(mDeckLink);
+    if (!mDeckLinkOutput) {
         mLastError = QStringLiteral("Device does not support video output");
         mDeckLink->Release();
         mDeckLink = nullptr;
@@ -291,17 +368,10 @@ bool DkDeckLinkOutput::startOutput(const DkOutputConfig &cfg)
 
     // Fill with black
     {
-        IDeckLinkVideoBuffer *vbuf = nullptr;
-        if (mFrame->QueryInterface(IID_IDeckLinkVideoBuffer,
-                                    reinterpret_cast<void **>(&vbuf)) == S_OK && vbuf) {
-            vbuf->StartAccess(bmdBufferAccessWrite);
-            void *buf = nullptr;
-            if (vbuf->GetBytes(&buf) == S_OK && buf)
-                std::memset(buf, 0,
-                            static_cast<size_t>(mFrame->GetRowBytes() * mFrame->GetHeight()));
-            vbuf->EndAccess(bmdBufferAccessWrite);
-            vbuf->Release();
-        }
+        FrameWriteBuffer wb(mFrame);
+        if (wb.buf)
+            std::memset(wb.buf, 0,
+                        static_cast<size_t>(mFrame->GetRowBytes() * mFrame->GetHeight()));
     }
 
     mRunning = true;
@@ -386,14 +456,10 @@ HRESULT DkDeckLinkOutput::ScheduledFrameCompleted(IDeckLinkVideoFrame *completed
         }
     }
 
-    if (hasPending && completedFrame) {
-        IDeckLinkMutableVideoFrame *mf = nullptr;
-        if (completedFrame->QueryInterface(IID_IDeckLinkMutableVideoFrame,
-                                           reinterpret_cast<void **>(&mf)) == S_OK && mf) {
-            fillFrame(mf, pending);
-            mf->Release();
-        }
-    }
+    // We only ever schedule one frame (mFrame); completedFrame IS mFrame.
+    // Avoid a QueryInterface whose IID may have changed across SDK versions.
+    if (hasPending && mFrame)
+        fillFrame(mFrame, pending);
 
     // Re-schedule the same frame to hold the still image (SDK handles its own ref count)
     if (mFrame)
@@ -415,20 +481,11 @@ HRESULT DkDeckLinkOutput::ScheduledPlaybackHasStopped()
 
 void DkDeckLinkOutput::fillFrame(IDeckLinkMutableVideoFrame *frame, const QImage &src)
 {
-    IDeckLinkVideoBuffer *vbuf = nullptr;
-    if (frame->QueryInterface(IID_IDeckLinkVideoBuffer,
-                               reinterpret_cast<void **>(&vbuf)) != S_OK || !vbuf)
+    FrameWriteBuffer wb(frame);
+    if (!wb.buf)
         return;
 
-    vbuf->StartAccess(bmdBufferAccessWrite);
-    void *dst = nullptr;
-    vbuf->GetBytes(&dst);
-    if (!dst) {
-        vbuf->EndAccess(bmdBufferAccessWrite);
-        vbuf->Release();
-        return;
-    }
-
+    void *dst = wb.buf;
     const long rowBytes = frame->GetRowBytes();
     const int fw = static_cast<int>(frame->GetWidth());
     const int fh = static_cast<int>(frame->GetHeight());
@@ -458,9 +515,7 @@ void DkDeckLinkOutput::fillFrame(IDeckLinkMutableVideoFrame *frame, const QImage
     case bmdFormat10BitYUV:   fillYUV10  (dst, rowBytes, canvas); break;
     default: break;
     }
-
-    vbuf->EndAccess(bmdBufferAccessWrite);
-    vbuf->Release();
+    // FrameWriteBuffer destructor calls EndAccess + Release
 }
 
 // -----------------------------------------------------------------------

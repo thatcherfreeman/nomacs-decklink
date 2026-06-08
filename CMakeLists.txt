@@ -132,6 +132,7 @@ set(HEADERS
     src/DkDeckLinkOutput.h
     src/DkDeckLinkDialog.h
     src/DkDeckLinkPlatform.h
+    src/DkDeckLinkCompat.h
 )
 
 qt_add_resources(PLUGIN_RCC src/nomacsPlugin.qrc)

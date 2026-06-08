@@ -47,35 +47,9 @@ static const GUID IID_IDeckLinkVideoBuffer_v15_3_1 =
 static const GUID IID_IDeckLinkVideoFrame_v14_2_1 =
     { 0x3F716FE0, 0xF023, 0x4111, { 0xBE, 0x5D, 0xEF, 0x44, 0x14, 0xC0, 0x5B, 0x17 } };
 
-// ── Interface classes ─────────────────────────────────────────────────────────
-// We define only the interfaces whose methods we actually invoke directly.
-// IDeckLinkOutput_v15_3_1, IDeckLinkConfiguration_v15_3_1, and
-// IDeckLinkProfileAttributes_v15_3_1 are obtained via QueryInterface and
-// immediately reinterpret_cast to the 16.0 type (same vtable layout; only
-// the IID changed), so no class definition is needed for them.
-
-// Vtable order must match the IDL exactly (sourced from DeckLinkAPI_v15_3_1.idl).
-class IDeckLinkVideoBuffer_v15_3_1 : public IUnknown
-{
-public:
-    virtual HRESULT STDMETHODCALLTYPE GetBytes(void **buffer) = 0;
-    virtual HRESULT STDMETHODCALLTYPE StartAccess(BMDBufferAccessFlags flags) = 0;
-    virtual HRESULT STDMETHODCALLTYPE EndAccess(BMDBufferAccessFlags flags) = 0;
-};
-
-// Vtable order must match the IDL exactly (sourced from DeckLinkAPI_v14_2_1.idl).
-// We only call GetBytes; the preceding slots are listed to keep vtable alignment.
-class IDeckLinkVideoFrame_v14_2_1 : public IUnknown
-{
-public:
-    virtual long           STDMETHODCALLTYPE GetWidth()  = 0;
-    virtual long           STDMETHODCALLTYPE GetHeight() = 0;
-    virtual long           STDMETHODCALLTYPE GetRowBytes() = 0;
-    virtual BMDPixelFormat STDMETHODCALLTYPE GetPixelFormat() = 0;
-    virtual BMDFrameFlags  STDMETHODCALLTYPE GetFlags()  = 0;
-    virtual HRESULT        STDMETHODCALLTYPE GetBytes(void **buffer) = 0;
-    virtual HRESULT        STDMETHODCALLTYPE GetTimecode(BMDTimecodeFormat, IDeckLinkTimecode **) = 0;
-    virtual HRESULT        STDMETHODCALLTYPE GetAncillaryData(IDeckLinkVideoFrameAncillary **) = 0;
-};
+// The interface class definitions for IDeckLinkVideoBuffer_v15_3_1 and
+// IDeckLinkVideoFrame_v14_2_1 are already present in the MIDL-generated
+// DeckLinkAPI.h (the main IDL imports the compat IDLs).  We only need the
+// IID constants, which are not emitted into DeckLinkAPI_i.c.
 
 #endif // __APPLE__ / _WIN32

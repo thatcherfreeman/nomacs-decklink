@@ -37,8 +37,8 @@
 
 // On Windows, DeckLinkAPI.idl #includes the compat IDLs (DeckLinkAPI_v15_3_1.idl,
 // DeckLinkAPI_v14_2_1.idl, etc.) so MIDL inlines all compat interface class
-// definitions into the generated DeckLinkAPI.h and all GUID definitions into
-// DeckLinkAPI_i.c.  Nothing extra is needed here.
+// definitions into the generated DeckLinkAPI.h.  GUIDs are defined in
+// DkDeckLinkGuids.cpp — nothing extra is needed here.
 
 #endif // __APPLE__ / _WIN32
 

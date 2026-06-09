@@ -3,7 +3,7 @@
 #include "DkDeckLinkCompat.h"
 
 #ifdef _WIN32
-// midl-generated DeckLinkAPI.h does not declare these; DeckLinkAPIDispatch.cpp defines them.
+// midl-generated DeckLinkAPI.h does not declare these; DkDeckLinkDispatch.cpp defines them.
 IDeckLinkIterator* CreateDeckLinkIteratorInstance();
 IDeckLinkAPIInformation* CreateDeckLinkAPIInformationInstance();
 IDeckLinkVideoConversion* CreateVideoConversionInstance();
